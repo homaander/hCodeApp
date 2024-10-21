@@ -33,6 +33,7 @@ dependencies:
 - mtl
 
 ghc-options:
+- -threaded
 - -Wall
 - -Wcompat
 - -Widentities

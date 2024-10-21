@@ -25,6 +25,12 @@ import Data.Maybe ( fromMaybe )
 import Data.Text (Text)
 import qualified Data.Text as T
 
+-- HC.toTape (HC.getArr "HELLO" :: [HNumsL])
+-- (44.57 secs, 25,886,063,400 bytes)
+
+-- HC.getTapeId (HC.getArr "HELLO" :: [HNumsL])
+-- (21.00 secs, 10,539,351,968 bytes)
+
 class (Show a, Code [a]) => Arr a where
   showArr :: [a] -> Text
   showArr [] = ""

@@ -16,6 +16,13 @@ import qualified Data.Text as T
 import TextShow ( TextShow(showt) )
 
 
+--
+--
+import MyParalel.ParallelTest
+--
+--
+
+
 import qualified Code.HomaCode as HC
 import Code.HomaCodeData
 

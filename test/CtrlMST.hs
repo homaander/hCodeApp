@@ -29,7 +29,7 @@ data Node s a = Node {
 -- <<ST action>>
 
 instance MonadFail (ST s) where
-    fail s = errorWithoutStackTrace s
+    fail = errorWithoutStackTrace
 
 empty :: ST s (MList s a)
 empty  = MList <$> newSTRef 0 <*> newSTRef Nothing
