@@ -30,10 +30,10 @@ dependencies:
 - text-show
 - aeson
 - parallel
+- deepseq
 - mtl
 
 ghc-options:
-- -threaded
 - -Wall
 - -Wcompat
 - -Widentities

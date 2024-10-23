@@ -15,16 +15,20 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import TextShow ( TextShow(showt) )
 
-
---
---
-import MyParalel.ParallelTest
---
---
-
-
 import qualified Code.HomaCode as HC
 import Code.HomaCodeData
+
+--
+--
+import MyParallel.ParallelTest
+import MyParallel.ParallelHC
+
+main :: IO ()
+main = do
+  print $ gogo
+
+--
+--
 
 -- import Data.Maybe
 -- import qualified Monomer.Lens as L
@@ -189,8 +193,8 @@ handleEvent _ _ model evt =
     decodeTR = transpose $ map HC.decode incodeTR
 
 
-main :: IO ()
-main = do
+main' :: IO ()
+main' = do
     startApp model handleEvent buildUI config
   where
     config = [

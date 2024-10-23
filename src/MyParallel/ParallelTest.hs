@@ -1,4 +1,4 @@
-module MyParalel.ParallelTest (
+module MyParallel.ParallelTest (
   evalTest, evalTest2, defaultTest
 ) where
 
