@@ -72,7 +72,7 @@ main :: IO ()
 -- main = mainUI
 
 -- Find ID
--- main = print $ getTapeIdParallel exampleData2 [0..250]
+-- main = print $ getTapeIdParallel exampleData2 [0..1000]
 -- [0,0,0,0,Z,9]
 -- main = print $ getTapeIdParallel exampleData2 [251..500]
 -- [0,0,0,0,O,9]
@@ -92,7 +92,7 @@ main :: IO ()
 main = print $ getOffsetParallel (HC.getArr @HNumsL "8NH663") exampleData2 [0..250]
 
 
--- main = print $ getOffsetParallel (HC.getArr @HNumsL "8N6") (HC.getArr @HNumsL "8N6") [0..250]
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "8N666") (HC.getArr @HNumsL "8N6") [0..100]
 
 type WidgetEnv'    = WidgetEnv AppModel AppEvent
 type WidgetNode'   = WidgetNode AppModel AppEvent

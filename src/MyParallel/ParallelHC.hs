@@ -13,32 +13,32 @@ import Data.List (elemIndex)
 import Data.Maybe (isJust)
 
 
+-- stack run -- -O2 +RTS -N8 -A512M -s -l
 
 -- Strats
-myStata :: Strategy a
-myStata = rpar
-
 myStataDeep :: NFData a => Strategy a
 myStataDeep a = rseq $ force a
 
+instance NFData HNumsL where rnf a = seq a ()
+
 
 getTapeIdParallel :: [HNumsL] -> [Int] -> [HNumsL]
-getTapeIdParallel dat c =
-  minimum $
-  parMap myStata (getTapeIdFromChank dat) c
+getTapeIdParallel dat c = minimum res
+  where
+    res = map (getTapeIdFromChank dat) c `using` parList rpar
 
 getTapeIdFromChank :: [HNumsL] -> Int -> [HNumsL]
 getTapeIdFromChank a n = 
   minimum $
-  take 10000 $
-  drop (10000 * n) $
+  take 1000 $
+  drop (1000 * n) $
   iterate HC.code (HC.code a)
 
 
 getOffsetParallel :: [HNumsL] -> [HNumsL] -> [Int] -> [(Int, Maybe Int)]
-getOffsetParallel a b c =
-  filter (\(_,b) -> isJust b) $
-  parMap (rparWith myStataDeep) (getOffsetChank a b) c
+getOffsetParallel a b c = filter (\(_,b) -> isJust b) res
+  where
+    res = map (getOffsetChank a b) c `using` parList myStataDeep
 
 getOffsetChank :: (Eq a, HC.Code a) => a -> a -> Int -> (Int, Maybe Int)
 getOffsetChank a b n = 
