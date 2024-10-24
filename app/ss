@@ -1,0 +1,73 @@
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "ANDREW")
+[K,_,_,Y,Q,P]
+(19.84 secs, 9,911,444,960 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "K__YQP")
+[P,0,B,8,I,0]
+(15.56 secs, 9,911,413,360 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "P0B8I0")
+[3,7,C,6,E,L]
+(19.93 secs, 9,911,416,128 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "37C6EL")
+[T,9,3,G,M,L]
+(19.84 secs, 9,911,428,848 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "T93GML")
+[R,O,A,H,2,V]
+(19.77 secs, 9,911,347,440 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "ROAH2V")
+[7,U,N,3,A,7]
+(15.63 secs, 9,911,374,680 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "7UN3A7")
+[B,C,C,6,Q,0]
+(16.16 secs, 9,911,416,112 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "BCC6Q0")
+[0,S,M,G,A,Q]
+(16.38 secs, 9,911,405,480 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "0SMGAQ")
+[4,5,F,V,M,X]
+(16.19 secs, 9,911,397,440 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "45FVMX")
+[_,I,P,G,0,Q]
+(16.25 secs, 9,911,428,072 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "_IPG0Q")
+[5,M,U,4,S,Q]
+(19.79 secs, 9,911,436,872 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "5MU4SQ")
+[Q,6,8,A,N,A]
+(19.16 secs, 9,911,453,792 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "Q68ANA")
+[8,G,1,0,R,E]
+(16.22 secs, 9,911,416,008 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "8G10RE")
+[V,_,8,M,V,U]
+(16.18 secs, 9,911,398,488 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "V_8MVU")
+[8,4,X,0,Z,R]
+(19.88 secs, 9,911,412,592 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "84X0ZR")
+[Z,X,V,F,W,D]
+(19.20 secs, 9,911,377,744 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "ZXVFWD")
+[B,G,J,9,Z,G]
+(16.29 secs, 9,911,436,488 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "BGJ9ZG")
+[Y,X,3,3,B,I]
+(15.62 secs, 9,911,434,544 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "YX33BI")
+[1,J,2,F,D,Y]
+(19.96 secs, 9,911,383,336 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "1J2FDY")
+[U,R,5,1,0,Q]
+(19.82 secs, 9,911,436,664 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "UR510Q")
+[H,X,8,0,L,F]
+(16.18 secs, 9,911,441,704 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "HX80LF")
+[T,A,7,2,W,N]
+(15.58 secs, 9,911,386,200 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "TA72WN")
+[T,Z,S,V,9,P]
+(16.19 secs, 9,911,431,560 bytes)
+λ: HC.codeN 1250000 (HC.getArr @HNumsL "TZSV9P")
+[8,N,H,6,6,3]
+(19.20 secs, 9,911,381,248 bytes)
+λ:

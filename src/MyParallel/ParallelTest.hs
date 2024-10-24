@@ -6,6 +6,7 @@ import qualified Code.HomaCode as HC
 import Code.HomaCodeData
 
 import Control.Parallel.Strategies
+import Control.DeepSeq
 
 import Data.Text
 
@@ -18,6 +19,16 @@ defaultTest x = (HC.getTapeId y, HC.getTapeLength y)
 -- defaultTest "HELLO"
 -- evalTest    "HELLO"
 -- evalTest2   "HELLO"
+
+-- Strategy
+firstStrat :: (NFData a, NFData b) => Strategy (a, b)
+firstStrat (a, b) = do
+  a' <- rpar $ force a
+  b' <- rpar $ force b
+  return (a', b')
+
+-- >>> (2 + 33, 4 + 5) `using` firstStrat
+-- (35,9)
 
 -- Eval
 evalTest :: Text -> ([HNumsL], Int)

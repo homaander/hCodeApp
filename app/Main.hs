@@ -18,17 +18,8 @@ import TextShow ( TextShow(showt) )
 import qualified Code.HomaCode as HC
 import Code.HomaCodeData
 
---
---
-import MyParallel.ParallelTest
+-- import MyParallel.ParallelTest
 import MyParallel.ParallelHC
-
-main :: IO ()
-main = do
-  print $ gogo
-
---
---
 
 -- import Data.Maybe
 -- import qualified Monomer.Lens as L
@@ -68,6 +59,40 @@ data AppEvent = AppInit
   deriving (Eq, Show)
 
 
+exampleData1 :: [Int]
+exampleData1 = HC.getArr @Int "34209472"
+
+exampleData2 :: [HNumsL]
+exampleData2 = HC.getArr @HNumsL "ANDREW"
+
+resultId2 :: [HNumsL]
+resultId2 = HC.getArr @HNumsL "0000O9"
+
+main :: IO ()
+-- main = mainUI
+
+-- Find ID
+-- main = print $ getTapeIdParallel exampleData2 [0..250]
+-- [0,0,0,0,Z,9]
+-- main = print $ getTapeIdParallel exampleData2 [251..500]
+-- [0,0,0,0,O,9]
+
+-- Find len
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "ANDREW") exampleData2 [0..250]
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "P0B8I0") exampleData2 [0..250]
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "T93GML") exampleData2 [0..250]
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "7UN3A7") exampleData2 [0..250]
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "0SMGAQ") exampleData2 [0..250]
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "_IPG0Q") exampleData2 [0..250]
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "Q68ANA") exampleData2 [0..250]
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "V_8MVU") exampleData2 [0..250]
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "YX33BI") exampleData2 [0..250]
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "UR510Q") exampleData2 [0..250]
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "TA72WN") exampleData2 [0..250]
+main = print $ getOffsetParallel (HC.getArr @HNumsL "8NH663") exampleData2 [0..250]
+
+
+-- main = print $ getOffsetParallel (HC.getArr @HNumsL "8N6") (HC.getArr @HNumsL "8N6") [0..250]
 
 type WidgetEnv'    = WidgetEnv AppModel AppEvent
 type WidgetNode'   = WidgetNode AppModel AppEvent
@@ -193,8 +218,8 @@ handleEvent _ _ model evt =
     decodeTR = transpose $ map HC.decode incodeTR
 
 
-main' :: IO ()
-main' = do
+mainUI :: IO ()
+mainUI = do
     startApp model handleEvent buildUI config
   where
     config = [
@@ -214,3 +239,4 @@ main' = do
               ]
               1 "Int" 1
               "?????" 0 0 0
+
