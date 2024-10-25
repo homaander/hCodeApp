@@ -15,7 +15,7 @@ defaultTest :: Text -> ([HNumsL], Int)
 defaultTest x = (HC.getTapeId y, HC.getTapeLength y)
   where y = HC.getArr x :: [HNumsL]
 
--- stack repl --ghci-options='+RTS -N -RTS'
+-- stack repl --ghci-options='+RTS -N2 -RTS'
 -- defaultTest "HELLO"
 -- evalTest    "HELLO"
 -- evalTest2   "HELLO"

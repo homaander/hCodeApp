@@ -2,6 +2,7 @@
 module MyParallel.ParallelHC (
    getTapeIdParallel
  , getOffsetParallel
+ , getStarter
 ) where
 
 import qualified Code.HomaCode as HC
@@ -11,9 +12,11 @@ import Control.Parallel.Strategies
 import Control.DeepSeq
 import Data.List (elemIndex)
 import Data.Maybe (isJust)
+import Code.HomaCode (Code(codeN))
 
 
--- stack run -- -O2 +RTS -N8 -A512M -s -l
+-- stack run -- -O2 +RTS -N8 -A1G -s
+-- stack run -- -O2 +RTS -N8 -A1G -s -l
 
 -- Strats
 myStataDeep :: NFData a => Strategy a
@@ -28,11 +31,21 @@ getTapeIdParallel dat c = minimum res
     res = map (getTapeIdFromChank dat) c `using` parList rpar
 
 getTapeIdFromChank :: [HNumsL] -> Int -> [HNumsL]
-getTapeIdFromChank a n = 
+getTapeIdFromChank a n =
   minimum $
-  take 1000 $
-  drop (1000 * n) $
+  take 10000 $
+  drop (10000 * n) $
   iterate HC.code (HC.code a)
+
+
+getStarter :: [HNumsL] -> [[HNumsL]]
+getStarter a = [a, a1, a2, a3, a4, a5]
+  where
+    a1 = HC.codeN 2500000 a
+    a2 = HC.codeN 2500000 a1
+    a3 = HC.codeN 2500000 a2
+    a4 = HC.codeN 2500000 a3
+    a5 = HC.codeN 2500000 a4
 
 
 getOffsetParallel :: [HNumsL] -> [HNumsL] -> [Int] -> [(Int, Maybe Int)]
@@ -41,7 +54,7 @@ getOffsetParallel a b c = filter (\(_,b) -> isJust b) res
     res = map (getOffsetChank a b) c `using` parList myStataDeep
 
 getOffsetChank :: (Eq a, HC.Code a) => a -> a -> Int -> (Int, Maybe Int)
-getOffsetChank a b n = 
+getOffsetChank a b n =
   (,) (10000 * n) $ elemIndex b $
   take 10000 $
   drop (10000 * n) $
