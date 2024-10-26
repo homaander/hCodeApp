@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
 module MyParallel.ParallelHC (
    getTapeIdParallel
  , getOffsetParallel
@@ -10,19 +9,24 @@ import Code.HomaCodeData
 
 import Control.Parallel.Strategies
 import Control.DeepSeq
+
+
 import Data.List (elemIndex)
 import Data.Maybe (isJust)
-import Code.HomaCode (Code(codeN))
-
-
--- stack run -- -O2 +RTS -N8 -A1G -s
--- stack run -- -O2 +RTS -N8 -A1G -s -l
 
 -- Strats
 myStataDeep :: NFData a => Strategy a
 myStataDeep a = rseq $ force a
 
-instance NFData HNumsL where rnf a = seq a ()
+
+getStarter :: [HNumsL] -> [[HNumsL]]
+getStarter a = [a, a1, a2, a3, a4, a5]
+  where
+    a1 = HC.codeN 2500000 a
+    a2 = HC.codeN 2500000 a1
+    a3 = HC.codeN 2500000 a2
+    a4 = HC.codeN 2500000 a3
+    a5 = HC.codeN 2500000 a4
 
 
 getTapeIdParallel :: [HNumsL] -> [Int] -> [HNumsL]
@@ -38,18 +42,8 @@ getTapeIdFromChank a n =
   iterate HC.code (HC.code a)
 
 
-getStarter :: [HNumsL] -> [[HNumsL]]
-getStarter a = [a, a1, a2, a3, a4, a5]
-  where
-    a1 = HC.codeN 2500000 a
-    a2 = HC.codeN 2500000 a1
-    a3 = HC.codeN 2500000 a2
-    a4 = HC.codeN 2500000 a3
-    a5 = HC.codeN 2500000 a4
-
-
 getOffsetParallel :: [HNumsL] -> [HNumsL] -> [Int] -> [(Int, Maybe Int)]
-getOffsetParallel a b c = filter (\(_,b) -> isJust b) res
+getOffsetParallel a b c = filter (\(_,g) -> isJust g) res
   where
     res = map (getOffsetChank a b) c `using` parList myStataDeep
 

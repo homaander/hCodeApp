@@ -1,5 +1,8 @@
 module MyParallel.ParallelTest (
-  evalTest, evalTest2, defaultTest
+    defaultTest
+  , evalTest
+  , evalTest2
+  , evalTest3
 ) where
 
 import qualified Code.HomaCode as HC
@@ -10,15 +13,20 @@ import Control.DeepSeq
 
 import Data.Text
 
+-- stack run -- -O2 +RTS -N8 -A1G
+-- stack run -- -O2 +RTS -N8 -A1G -s
+-- stack run -- -O2 +RTS -N8 -A1G -s -l
+
+-- stack repl --ghci-options='+RTS -N2 -s -RTS'
+-- defaultTest "HELLO"
+-- evalTest    "HELLO"
+-- evalTest2   "HELLO"
+
 
 defaultTest :: Text -> ([HNumsL], Int)
 defaultTest x = (HC.getTapeId y, HC.getTapeLength y)
   where y = HC.getArr x :: [HNumsL]
 
--- stack repl --ghci-options='+RTS -N2 -RTS'
--- defaultTest "HELLO"
--- evalTest    "HELLO"
--- evalTest2   "HELLO"
 
 -- Strategy
 firstStrat :: (NFData a, NFData b) => Strategy (a, b)
@@ -48,6 +56,13 @@ evalTest2 t = runEval $ do
   rseq a
   rseq b
   return (a, b)
+  where
+    x = HC.getArr t :: [HNumsL]
+    f1 = HC.getTapeId
+    f2 = HC.getTapeLength
+
+evalTest3 :: Text -> ([HNumsL], Int)
+evalTest3 t = (f1 x, f2 x) `using` firstStrat
   where
     x = HC.getArr t :: [HNumsL]
     f1 = HC.getTapeId

@@ -7,6 +7,9 @@ module Code.HomaCodeData (
 import Data.List ( elemIndex )
 import Data.Maybe
 
+import Control.Parallel.Strategies
+import Control.DeepSeq
+
 data HNums16 = H00 | H01 | H02 | H03
              | H04 | H05 | H06 | H07
              | H08 | H09 | H10 | H11
@@ -44,6 +47,9 @@ instance Read HNums16 where
 
 instance Show HNumsL where
   show a = alfabet !! fromEnum a
+
+instance NFData HNumsL where 
+  rnf a = seq a ()
 
 -- >>> read "5" :: HNums16
 -- 5
