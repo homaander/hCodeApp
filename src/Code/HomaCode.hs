@@ -10,6 +10,10 @@ module Code.HomaCode (
   , HDataInfo(..)
   , Arr(..)
 
+  , tt
+  , gg
+  , getaa
+
   -- , HNums16(..)
   -- , HNumsL(..)
   -- , HTape (..)
@@ -23,6 +27,32 @@ import Data.Maybe ( fromMaybe )
 
 import Data.Text (Text)
 import qualified Data.Text as T
+
+
+
+
+(^*) :: Int -> Int -> Int
+(^*) a b = (a * b) `mod` 10
+
+(^^*) :: HNumsL -> HNumsL -> HNumsL
+(^^*) a b = toEnum $ (fromEnum a * fromEnum b) `mod` 37
+
+getaa :: Int -> [[HNumsL]]
+getaa a = map (codeN (a - 1)) [[L00,L00,L00,L00,L36,L01], [L00,L00,L00,L36,L01,L00], [L00,L00,L36,L01,L00,L00], [L00,L36,L01,L00,L00,L00], [L36,L01,L00,L00,L00,L00], [L01,L00,L00,L00,L00,L00]]
+
+gg dat = map (foldl (^+) L00) $ zipWith (zipWith (^^*)) rl (replicate 6 dat)
+  where
+    fl = [[L00,L00,L00,L00,L36,L01], [L00,L00,L00,L36,L01,L00], [L00,L00,L36,L01,L00,L00], [L00,L36,L01,L00,L00,L00], [L36,L01,L00,L00,L00,L00], [L01,L00,L00,L00,L00,L00]]
+    rl = map (codeN 9) fl
+
+-- for 10
+tt dat = map (foldl (^+) 0) $ zipWith (zipWith (^*)) rl (replicate 6 dat)
+  where
+    fl = [[0,0,0,0,9,1], [0,0,0,9,1,0], [0,0,9,1,0,0], [0,9,1,0,0,0], [9,1,0,0,0,0], [1,0,0,0,0,0]] :: [[Int]]
+    rl = map (codeN 9) fl
+
+
+
 
 -- HC.toTape (HC.getArr "HELLO" :: [HNumsL])
 -- (44.57 secs, 25,886,063,400 bytes)
