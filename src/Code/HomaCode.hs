@@ -40,16 +40,16 @@ import qualified Data.Text as T
 getaa :: Int -> [[HNumsL]]
 getaa a = map (codeN (a - 1)) [[L00,L00,L00,L00,L36,L01], [L00,L00,L00,L36,L01,L00], [L00,L00,L36,L01,L00,L00], [L00,L36,L01,L00,L00,L00], [L36,L01,L00,L00,L00,L00], [L01,L00,L00,L00,L00,L00]]
 
-gg dat = map (foldl (^+) L00) $ zipWith (zipWith (^^*)) rl (replicate 6 dat)
+gg a dat = map (foldl (^+) L00) $ zipWith (zipWith (^^*)) rl (replicate 6 dat)
   where
     fl = [[L00,L00,L00,L00,L36,L01], [L00,L00,L00,L36,L01,L00], [L00,L00,L36,L01,L00,L00], [L00,L36,L01,L00,L00,L00], [L36,L01,L00,L00,L00,L00], [L01,L00,L00,L00,L00,L00]]
-    rl = map (codeN 9) fl
+    rl = map (codeN (a - 1)) fl
 
 -- for 10
-tt dat = map (foldl (^+) 0) $ zipWith (zipWith (^*)) rl (replicate 6 dat)
+tt a dat = map (foldl (^+) 0) $ zipWith (zipWith (^*)) rl (replicate 6 dat)
   where
     fl = [[0,0,0,0,9,1], [0,0,0,9,1,0], [0,0,9,1,0,0], [0,9,1,0,0,0], [9,1,0,0,0,0], [1,0,0,0,0,0]] :: [[Int]]
-    rl = map (codeN 9) fl
+    rl = map (codeN (a - 1)) fl
 
 
 
