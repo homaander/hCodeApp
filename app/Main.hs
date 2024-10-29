@@ -19,7 +19,7 @@ import qualified Code.HomaCode as HC
 import Code.HomaCodeData
 
 -- import MyParallel.ParallelTest
-import MyParallel.ParallelHC
+-- import MyParallel.ParallelHC
 
 -- import Data.Maybe
 -- import qualified Monomer.Lens as L

@@ -10,9 +10,10 @@ module Code.HomaCode (
   , HDataInfo(..)
   , Arr(..)
 
-  , tt
-  , gg
-  , getaa
+  , getPreset
+  , codePreset
+  , codeNPreset
+  , codeNPresetInt
 
   -- , HNums16(..)
   -- , HNumsL(..)
@@ -21,35 +22,43 @@ module Code.HomaCode (
 
 import Code.HomaCodeData
 import Code.HomaCodeClasses
+
 import Data.List ( elemIndex )
 import Data.Maybe ( fromMaybe )
-
-
 import Data.Text (Text)
 import qualified Data.Text as T
 
 
 
-
-(^*) :: Int -> Int -> Int
-(^*) a b = (a * b) `mod` 10
-
-(^^*) :: HNumsL -> HNumsL -> HNumsL
-(^^*) a b = toEnum $ (fromEnum a * fromEnum b) `mod` 37
-
-getaa :: Int -> [[HNumsL]]
-getaa a = map (codeN (a - 1)) [[L00,L00,L00,L00,L36,L01], [L00,L00,L00,L36,L01,L00], [L00,L00,L36,L01,L00,L00], [L00,L36,L01,L00,L00,L00], [L36,L01,L00,L00,L00,L00], [L01,L00,L00,L00,L00,L00]]
-
-gg a dat = map (foldl (^+) L00) $ zipWith (zipWith (^^*)) rl (replicate 6 dat)
+getPreset :: Int -> [[HNumsL]]
+getPreset a | a <= 0    = map (decodeN (1 - a)) preset
+            | otherwise = map (codeN (a - 1)) preset
   where
-    fl = [[L00,L00,L00,L00,L36,L01], [L00,L00,L00,L36,L01,L00], [L00,L00,L36,L01,L00,L00], [L00,L36,L01,L00,L00,L00], [L36,L01,L00,L00,L00,L00], [L01,L00,L00,L00,L00,L00]]
-    rl = map (codeN (a - 1)) fl
+    preset = [ [L00,L00,L00,L00,L36,L01]
+             , [L00,L00,L00,L36,L01,L00]
+             , [L00,L00,L36,L01,L00,L00]
+             , [L00,L36,L01,L00,L00,L00]
+             , [L36,L01,L00,L00,L00,L00]
+             , [L01,L00,L00,L00,L00,L00]
+             ]
 
--- for 10
-tt a dat = map (foldl (^+) 0) $ zipWith (zipWith (^*)) rl (replicate 6 dat)
+codePreset :: [[HNumsL]] -> [HNumsL] -> [HNumsL]
+codePreset preset dat = map (foldl (^+) L00 . (^* dat)) preset
+
+codeNPreset :: Int -> [HNumsL] -> [HNumsL]
+codeNPreset = codePreset . getPreset
+
+codeNPresetInt :: Int -> [Int] -> [Int]
+codeNPresetInt n dat = map (foldl (^+) 0 . (^* dat)) preset
   where
-    fl = [[0,0,0,0,9,1], [0,0,0,9,1,0], [0,0,9,1,0,0], [0,9,1,0,0,0], [9,1,0,0,0,0], [1,0,0,0,0,0]] :: [[Int]]
-    rl = map (codeN (a - 1)) fl
+    fl = [ [0,0,0,0,9,1]
+         , [0,0,0,9,1,0]
+         , [0,0,9,1,0,0]
+         , [0,9,1,0,0,0]
+         , [9,1,0,0,0,0]
+         , [1,0,0,0,0,0]
+         ] :: [[Int]]
+    preset = map (codeN (n - 1)) fl
 
 
 
@@ -71,38 +80,29 @@ class (Show a, Code [a]) => Arr a where
   getArr :: Text -> [a]
   getArr arr = map fakeRead $ T.unpack arr
 
-  showDecN :: Int -> [a] -> Text
-  showDecN  n = showArr . decodeN n
-
-  showCodeN :: Int -> [a] -> Text
-  showCodeN  n = showArr . codeN n
-
   dataText :: Int -> [a] -> (Text, Text)
-  dataText n t = (showDecN n t, showCodeN n t)
+  dataText n t = ((showArr . decodeN n) t, (showArr . codeN n) t)
 
   tapeText :: HTape [a] -> HTape Text
   tapeText t = HTape (showArr $ tapeId t) (tapeOffset t) (tapeAntiOffset t) (tapeLength t)
 
 
-alfabet :: [Char]
-alfabet  = [ '0', '1', '2', '3', '4', '5'
-           , '6', '7', '8', '9', 'A', 'B'
-           , 'C', 'D', 'E', 'F', 'G', 'H'
-           , 'I', 'J', 'K', 'L', 'M', 'N'
-           , 'O', 'P', 'Q', 'R', 'S', 'T'
-           , 'U', 'V', 'W', 'X', 'Y', 'Z'
-           , '_'
-           ]
-
 instance Arr Int where
-  fakeRead a = fromMaybe 0 $ elemIndex a $ take (getMod @Int) alfabet
+  fakeRead a = fromMaybe 0 $
+               elemIndex a $
+               take (getMod @Int) hCAlfabet
 
 instance Arr HNums16 where
-  fakeRead a = toEnum $ fromMaybe 0 $ elemIndex a $ take (getMod @HNums16) alfabet
-
+  fakeRead a = toEnum $
+               fromMaybe 0 $
+               elemIndex a $
+               take (getMod @HNums16) hCAlfabet
 
 instance Arr HNumsL where
-  fakeRead a = toEnum $ fromMaybe 0 $ elemIndex a $ take (getMod @HNumsL) alfabet
+  fakeRead a = toEnum $
+               fromMaybe 0 $
+               elemIndex a $
+               take (getMod @HNumsL) hCAlfabet
 
 
 -- >>>  Code.HomaCodeClasses.toHDataN 6 1234 :: [Int]
