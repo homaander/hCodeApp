@@ -35,6 +35,13 @@ class Math a => HData a where
   toHData     :: Int ->  a
   toHDataN    :: Int -> Int -> a
 
+  toLength   :: Int ->  a  ->  a
+  getPreset  :: Int -> Int -> [a]
+  codePreset :: [a] ->  a  ->  a
+
+-- right offset
+  (^<<) :: a -> Int -> a
+
 
 class Math a => Code a where
   code   :: a -> a
@@ -143,6 +150,21 @@ instance (Math a, Enum a) => HData [a] where
   toHDataN count num = replicate (count - length dt) zero <> dt
     where
       dt = toHData num
+
+
+  toLength n dat = replicate pre zero <> dat
+    where
+      pre = n - length dat
+
+  getPreset n a | a <= 0    = map (decodeN (1 - a)) preset
+                | otherwise = map (codeN   (a - 1)) preset
+    where
+      st = toLength n [neg $ toEnum 1, toEnum 1]
+      preset = map (st ^<<) [0 .. n - 1]
+
+  codePreset preset dat = map (foldl (^+) zero . (^* dat)) preset
+
+  dat ^<< n = drop n dat <> replicate n zero
 
 
 -- Code 

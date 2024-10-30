@@ -15,6 +15,9 @@ module Code.HomaCode (
   , codeNPreset
   , codeNPresetInt
 
+  , (^<<)
+  , toLength
+
   -- , HNums16(..)
   -- , HNumsL(..)
   -- , HTape (..)
@@ -30,23 +33,8 @@ import qualified Data.Text as T
 
 
 
-getPreset :: Int -> [[HNumsL]]
-getPreset a | a <= 0    = map (decodeN (1 - a)) preset
-            | otherwise = map (codeN (a - 1)) preset
-  where
-    preset = [ [L00,L00,L00,L00,L36,L01]
-             , [L00,L00,L00,L36,L01,L00]
-             , [L00,L00,L36,L01,L00,L00]
-             , [L00,L36,L01,L00,L00,L00]
-             , [L36,L01,L00,L00,L00,L00]
-             , [L01,L00,L00,L00,L00,L00]
-             ]
-
-codePreset :: [[HNumsL]] -> [HNumsL] -> [HNumsL]
-codePreset preset dat = map (foldl (^+) L00 . (^* dat)) preset
-
 codeNPreset :: Int -> [HNumsL] -> [HNumsL]
-codeNPreset = codePreset . getPreset
+codeNPreset = codePreset . getPreset 6
 
 codeNPresetInt :: Int -> [Int] -> [Int]
 codeNPresetInt n dat = map (foldl (^+) 0 . (^* dat)) preset
