@@ -137,7 +137,7 @@ instance (Enum a, Math a) => HData [a] where
     where
       powArr = map (notation @a ^) powLen
       powLen = reverse [0 .. len - 1]
-      len    = length $ show num
+      len    = ceiling @Double @Int $ logBase (fromIntegral $ notation @a) (fromIntegral num)
   toHDataN count num = setLength count $ toHData num
 
 
