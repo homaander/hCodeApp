@@ -47,7 +47,7 @@ getOffsetParallel a b c = filter (\(_,g) -> isJust g) res
   where
     res = map (getOffsetChank a b) c `using` parList myStataDeep
 
-getOffsetChank :: (Eq a, HC.Code a) => a -> a -> Int -> (Int, Maybe Int)
+getOffsetChank :: HC.Code a => a -> a -> Int -> (Int, Maybe Int)
 getOffsetChank a b n =
   (,) (10000 * n) $ elemIndex b $
   take 10000 $

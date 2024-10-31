@@ -53,8 +53,8 @@ evalTest2 :: Text -> ([HNumsL], Int)
 evalTest2 t = runEval $ do
   a <- rpar (f1 x)
   b <- rpar (f2 x)
-  rseq a
-  rseq b
+  _ <- rseq a
+  _ <- rseq b
   return (a, b)
   where
     x = HC.getArr t :: [HNumsL]

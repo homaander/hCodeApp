@@ -1,11 +1,9 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE InstanceSigs #-}
 
 module Code.HomaCodeClasses (
     Math(..)
   , Code(..)
-  , CodeRecurse(..)
   , Tape(..)
   , HData(..)
   , HDataInfo(..)
@@ -13,209 +11,181 @@ module Code.HomaCodeClasses (
 
 import Code.HomaCodeData
 import Data.List  ( nub )
-import Data.Maybe ( mapMaybe )
+import Data.Maybe ( mapMaybe, fromJust )
 
 
-class (Eq a, Show a) => Math a where
+class (Ord a, Show a) => Math a where
   (^+) :: a -> a -> a
+  (^-) :: a -> a -> a
+  (^*) :: a -> a -> a
+
   neg  :: a -> a
   zero :: a
 
-  (^*) :: a -> a -> a
-
-  getMod :: Int
+  notation :: Int
 
   -- default
-  (^-) :: a -> a -> a
   (^-) a b = a ^+ neg b
 
 
 class Math a => HData a where
+  (^<<) :: a -> Int -> a
+  (^>>) :: a -> Int -> a
+
   fromHData   ::  a  -> Int
   toHData     :: Int ->  a
   toHDataN    :: Int -> Int -> a
 
-  toLength   :: Int ->  a  ->  a
-  getPreset  :: Int -> Int -> [a]
-  codePreset :: [a] ->  a  ->  a
-
--- right offset
-  (^<<) :: a -> Int -> a
+  setLength   :: Int ->  a  -> a
 
 
-class Math a => Code a where
-  code   :: a -> a
-  decode :: a -> a
+class HData a => Code a where
+  (^->) :: a -> Int -> a
+  (^<-) :: a -> Int -> a
+
+  code       ::  a  -> a
+  codeN      :: Int -> a ->  a
+  codeNList  :: Int -> a -> [a]
+  codeR      ::  a  -> a
+  codePreset :: [a] -> a ->  a
+
+  decode  ::  a  -> a
+  decodeN :: Int -> a -> a
 
   findOffsetMaybe :: a -> a -> Maybe Int
   findListMaybe   :: a -> a -> Maybe [a]
 
+  getPreset :: Int -> Int -> [a]
+
   -- default
-  codeN :: Int -> a -> a
-  codeN n hdata = iterate code hdata !! n
+  (^->)  = flip codeN
+  (^<-)  = flip decodeN
 
-  nextNCode :: Int -> a -> [a]
-  nextNCode n ihd = take n $ iterate code (code ihd)
+  codeN     n hdata = iterate code hdata !! n
+  codeNList n ihd   = take n $ iterate code (code ihd)
 
-  decodeN :: Int -> a -> a
+  codeR hdata = codeN (fromHData hdata) hdata
+
   decodeN n hdata = iterate decode hdata !! n
 
-  (^->) :: a -> Int -> a
-  (^->)  = flip codeN
 
-
-class (Code a, HData a) => CodeRecurse a where
-  -- default
-  codeRecurse :: a -> a
-  codeRecurse hdata = codeN (fromHData hdata) hdata
-
-
-class (Ord a, Code a) => Tape a where
+class Code a => Tape a where
   toTape :: a -> HTape a
+  fromTape :: HTape a -> a
 
-  getTapeOffset :: a -> a -> Int
-  getTapeList   :: a -> a -> [a]
+  getTapeId     :: a -> a
+  getTapeLength :: a -> Int
+  getTapeList   :: a -> [a]
 
   -- default
-  fromTape :: HTape a -> a
   fromTape (HTape h n _ _) = codeN n h
 
-  getTapeId :: a -> a
-  getTapeId  = minimum . getTapeAll
+  getTapeId  = minimum . getTapeList
 
-  getTapeLength :: a -> Int
-  getTapeLength hdata = getTapeOffset hdata hdata
+  getTapeLength hdata = fromJust $ findOffsetMaybe hdata hdata
 
-  getTapeAll :: a -> [a]
-  getTapeAll hdata = getTapeList hdata hdata
+  getTapeList hdata = fromJust $ findListMaybe hdata hdata
 
 
-class (CodeRecurse a, Tape a) => HDataInfo a where
-  -- Get tape_id list from sums with offset second 0-500
+class Tape a => HDataInfo a where
   showDisperseList :: a -> a -> [a]
-  -- Get (offset b, anti-offset c) -> (a_0 + b_offset)_anti-offset = c_0
   findDisperseData :: a -> a -> a ->  [(Int,Int)]
 
 
 
 -- Math
 instance Math Int where
-  (^+) a b = (a + b) `mod` getMod @Int
-  neg n   = (getMod @Int - n) `mod` getMod @Int
-  (^*) a b = (a * b) `mod` getMod @Int
+  (^*) a b = (a * b) `mod` notation @Int
+  (^+) a b = (a + b) `mod` notation @Int
+  neg a    = toEnum $ (n - fromEnum a) `mod` n
+    where n = notation @Int
   zero = toEnum 0
-  getMod = 10
+  notation = 10
 
 instance Math HNums16 where
-  (^+) a b = toEnum $ (fromEnum a + fromEnum b) `mod` getMod @HNums16
-  neg n   = toEnum $ (getMod @HNums16 - fromEnum n) `mod` getMod @HNums16
-  (^*) a b = toEnum $ (fromEnum a * fromEnum b) `mod` getMod @HNums16
+  (^*) a b = toEnum $ (fromEnum a * fromEnum b) `mod` notation @HNums16
+  (^+) a b = toEnum $ (fromEnum a + fromEnum b) `mod` notation @HNums16
+  neg a    = toEnum $ (n - fromEnum a) `mod` n
+    where n = notation @HNums16
   zero = toEnum 0
-  getMod = 16
+  notation = 16
 
 instance Math HNumsL where
-  (^+) a b = toEnum $ (fromEnum a + fromEnum b) `mod` getMod @HNumsL
-  neg n   = toEnum $ (getMod @HNumsL - fromEnum n) `mod` getMod @HNumsL
-  (^*) a b = toEnum $ (fromEnum a * fromEnum b) `mod` getMod @HNumsL
+  (^*) a b = toEnum $ (fromEnum a * fromEnum b) `mod` notation @HNumsL
+  (^+) a b = toEnum $ (fromEnum a + fromEnum b) `mod` notation @HNumsL
+  neg a    = toEnum $ (n - fromEnum a) `mod` n
+    where n = notation @HNumsL
   zero = toEnum 0
-  getMod = 37
+  notation = 37
 
 
 instance Math a => Math [a] where
-  (^+) a b = zipWith (^+) (zerosA <> a) (zerosB <> b)
-    where
-      lRes = max lA lB
-      lA = length a
-      lB = length b
-      zerosA = replicate (lRes - lA) zero
-      zerosB = replicate (lRes - lB) zero
+  (^+)= zipWith (^+)
   neg = map neg
   (^*) = zipWith (^*)
   zero = [zero]
-  getMod = 1
+  notation = 1
 
 
 -- HData
-instance (Math a, Enum a) => HData [a] where
-  fromHData [] = 0
+instance (Enum a, Math a) => HData [a] where
   fromHData hdata = sum $ zipWith (*) (map fromEnum hdata) powArr
     where
-      powArr = map (getMod @a ^) powLen
+      powArr = map (notation @a ^) powLen
       powLen = reverse [0 .. length hdata - 1]
-  toHData num = map (toEnum . (`mod` getMod @a) . div num) powArr
+  toHData num = map (toEnum . (`mod` notation @a) . div num) powArr
     where
-      powArr = map (getMod @a ^) powLen
+      powArr = map (notation @a ^) powLen
       powLen = reverse [0 .. len - 1]
       len    = length $ show num
-  toHDataN count num = replicate (count - length dt) zero <> dt
-    where
-      dt = toHData num
+  toHDataN count num = setLength count $ toHData num
 
 
-  toLength n dat = replicate pre zero <> dat
+  setLength n dat = replicate pre zero <> dat
     where
       pre = n - length dat
+
+  dat ^<< n = drop n dat <> replicate n zero
+  dat ^>> n =  replicate n zero <> take (length dat - n) dat
+
+
+
+-- Code 
+instance (Enum a, Math a) => Code [a] where
+  code d = reverse $ zipWith (^-) d (d ^>> 1)
+
+  decode d = reverse [foldl (^+) zero (d ^<< a) | a <- [0 .. length d - 1]]
+
+  findOffsetMaybe ihd hdata = if res == maxlen then Nothing else Just res
+    where
+      res         = foldr finder 0 (codeNList maxlen ihd)
+      finder he n = if he == hdata then 1 else n + 1
+      maxlen      = notation @a ^ length ihd
+
+  findListMaybe ihd hdata = do
+    off <- findOffsetMaybe ihd hdata
+    pure $ ihd : codeNList off ihd
 
   getPreset n a | a <= 0    = map (decodeN (1 - a)) preset
                 | otherwise = map (codeN   (a - 1)) preset
     where
-      st = toLength n [neg $ toEnum 1, toEnum 1]
+      st = setLength n [neg $ toEnum 1, toEnum 1]
       preset = map (st ^<<) [0 .. n - 1]
 
   codePreset preset dat = map (foldl (^+) zero . (^* dat)) preset
 
-  dat ^<< n = drop n dat <> replicate n zero
-
-
--- Code 
-instance Math a => Code [a] where
-  code hdata = map (uncurry (^-)) pairs
-    where
-      pairs = reverse $ zip hdata (zero : hdata)
-
-  decode hdata = fst $
-    foldr (\e (r, a) -> (r <> [e ^+ a], e ^+ a)) ([], zero) hdata
-
-  findOffsetMaybe ihd hdata = if res == maxlen then Nothing else Just res
-    where
-      res = foldr
-        (\he n -> if he == hdata then 1 else n + 1) 0
-        (nextNCode maxlen ihd)
-      maxlen = getMod @a ^ length ihd
-
-  findListMaybe ihd hdata = if length res == maxlen then Nothing else Just res
-    where
-      res = ihd : foldr
-        (\he n -> if he == hdata then [he] else [he] <> n) []
-        (nextNCode maxlen ihd)
-      maxlen = getMod @a ^ length ihd
-
-
--- RecurseCode
-instance (Enum a, Math a) => CodeRecurse [a]
-
 
 -- Tape
-instance (Ord a, Enum a, Math a) => Tape [a] where
+instance (Enum a, Math a) => Tape [a] where
   toTape hdata = HTape hid offset (len - offset) len
     where
-      offset  = if   offset' == len
-                then 0
-                else offset'
-
-      offset' = getTapeOffset hid hdata
-      hid     = getTapeId     hdata
+      offset  = if offset' /= len then offset' else 0
+      offset' = fromJust $ findOffsetMaybe hid hdata
       len     = getTapeLength hdata
-
-  getTapeOffset ihd hdata =  foldr
-        (\he n -> if he == hdata then 1 else n + 1) 0 (iterate code (code ihd))
-
-  getTapeList ihd hdata = ihd : foldr
-        (\he n -> if he == hdata then [he] else [he] <> n) [] (iterate code (code ihd))
-
+      hid     = getTapeId     hdata
 
 -- HDataInfo
-instance (Eq a, Ord a, Enum a, Math a) => HDataInfo [a] where
+instance (Enum a, Math a) => HDataInfo [a] where
   showDisperseList aTape bTape = nub $ map (\n -> getTapeId (aTape ^+ codeN n bTape)) [0 .. 500]
 
   findDisperseData aTape bTape resTape = mapMaybe check [0 .. 500]
