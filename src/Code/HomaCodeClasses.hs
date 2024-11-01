@@ -6,7 +6,7 @@ module Code.HomaCodeClasses (
   , Code(..)
   , Tape(..)
   , HData(..)
-  , HDataInfo(..)
+  , TapeInfo(..)
 ) where
 
 import Code.HomaCodeData
@@ -70,7 +70,7 @@ class HData a => Code a where
 
 
 class Code a => Tape a where
-  toTape :: a -> HTape a
+  toTape   :: a -> HTape a
   fromTape :: HTape a -> a
 
   getTapeId     :: a -> a
@@ -83,13 +83,12 @@ class Code a => Tape a where
   getTapeId  = minimum . getTapeList
 
   getTapeLength hdata = fromJust $ findOffsetMaybe hdata hdata
+  getTapeList   hdata = fromJust $ findListMaybe hdata hdata
 
-  getTapeList hdata = fromJust $ findListMaybe hdata hdata
 
-
-class Tape a => HDataInfo a where
-  showDisperseList :: a -> a -> [a]
-  findDisperseData :: a -> a -> a ->  [(Int,Int)]
+class Tape a => TapeInfo a where
+  getSumsList :: a -> a -> [a]
+  getOfsetsSums :: a -> a -> a ->  [(Int,Int)]
 
 
 
@@ -118,7 +117,6 @@ instance Math HNumsL where
   zero = toEnum 0
   notation = 37
 
-
 instance Math a => Math [a] where
   (^+)= zipWith (^+)
   neg = map neg
@@ -140,14 +138,12 @@ instance (Enum a, Math a) => HData [a] where
       len    = ceiling @Double @Int $ logBase (fromIntegral $ notation @a) (fromIntegral num)
   toHDataN count num = setLength count $ toHData num
 
-
   setLength n dat = replicate pre zero <> dat
     where
       pre = n - length dat
 
   dat ^<< n = drop n dat <> replicate n zero
   dat ^>> n =  replicate n zero <> take (length dat - n) dat
-
 
 
 -- Code 
@@ -184,14 +180,16 @@ instance (Enum a, Math a) => Tape [a] where
       len     = getTapeLength hdata
       hid     = getTapeId     hdata
 
--- HDataInfo
-instance (Enum a, Math a) => HDataInfo [a] where
-  showDisperseList aTape bTape = nub $ map (\n -> getTapeId (aTape ^+ codeN n bTape)) [0 .. 500]
 
-  findDisperseData aTape bTape resTape = mapMaybe check [0 .. 500]
+-- TapeInfo
+instance (Enum a, Math a) => TapeInfo [a] where
+  getSumsList aTape bTape = nub $ map (\n -> getTapeId (aTape ^+ codeN n bTape)) [0 .. 500]
+
+  getOfsetsSums aTape bTape resTape = mapMaybe check [0 .. 500]
     where
       lid = getTapeId resTape
-      check n = if getTapeId nsum == lid then Just (n, tapeAntiOffset $ toTape nsum) else Nothing
+      check n = if tapeId nsumd == lid then Just (n, tapeAntiOffset nsumd) else Nothing
         where
-          nsum = aTape ^+ codeN n bTape
+          nsum  = aTape ^+ codeN n bTape
+          nsumd = toTape nsum
 

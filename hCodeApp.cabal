@@ -26,7 +26,7 @@ library
       Code.HomaCode
       Code.HomaCodeClasses
       Code.HomaCodeData
-      MyParallel.ParallelHC
+      Code.HomaCodeParallel
       MyParallel.ParallelTest
   other-modules:
       Paths_hCodeApp

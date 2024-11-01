@@ -17,9 +17,7 @@ import TextShow ( TextShow(showt) )
 
 import qualified Code.HomaCode as HC
 import Code.HomaCodeData
-
--- import MyParallel.ParallelTest
--- import MyParallel.ParallelHC
+import Code.HomaCodeParallel
 
 -- import Data.Maybe
 -- import qualified Monomer.Lens as L
@@ -185,6 +183,10 @@ handleEvent _ _ model evt =
 
 main :: IO ()
 main = do
+  print $ getStarter (HC.getArr @HNumsL "ANDREW")
+
+main' :: IO ()
+main' = do
     startApp model handleEvent buildUI config
   where
     config = [
