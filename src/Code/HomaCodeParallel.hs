@@ -3,7 +3,7 @@ module Code.HomaCodeParallel (
  , getOffsetParallel
  , getStarter
 
- , preset250000
+ , preset2_5M
 ) where
 
 import qualified Code.HomaCode as HC
@@ -13,22 +13,22 @@ import Control.Parallel.Strategies
 -- import Control.DeepSeq
 
 
-import Data.List (elemIndex)
+import Data.List  (elemIndex)
 import Data.Maybe (isJust)
 
 -- Strats
 
-preset250000 :: [[HNumsL]]
-preset250000 = map HC.getArr ["_DOD_5","DNQNI4","OQMVSH","DNVRU4","_ISU3H","54H4HG"]
+preset2_5M :: [[HNumsL]]
+preset2_5M = map HC.getArr ["_DOD_5","DNQNI4","OQMVSH","DNVRU4","_ISU3H","54H4HG"]
 
 getStarter :: [HNumsL] -> [[HNumsL]]
 getStarter a = [a, a1, a2, a3, a4, a5]
   where
-    a1 = HC.codePreset preset250000 a
-    a2 = HC.codePreset preset250000 a1
-    a3 = HC.codePreset preset250000 a2
-    a4 = HC.codePreset preset250000 a3
-    a5 = HC.codePreset preset250000 a4
+    a1 = HC.codePreset preset2_5M a
+    a2 = HC.codePreset preset2_5M a1
+    a3 = HC.codePreset preset2_5M a2
+    a4 = HC.codePreset preset2_5M a3
+    a5 = HC.codePreset preset2_5M a4
 
 
 getTapeIdParallel :: [HNumsL] -> [Int] -> [HNumsL]

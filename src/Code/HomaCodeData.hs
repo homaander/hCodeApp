@@ -1,8 +1,14 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Code.HomaCodeData (
     HNums16(..)
   , HNumsL (..)
   , HTape (..)
   , hCAlfabet
+
+  , showHData
+  , showH
+  , showHL
 ) where
 
 import Control.Parallel.Strategies
@@ -12,7 +18,7 @@ data HNums16 = H00 | H01 | H02 | H03
              | H04 | H05 | H06 | H07
              | H08 | H09 | H10 | H11
              | H12 | H13 | H14 | H15
-  deriving (Enum, Eq, Ord)
+  deriving (Enum, Eq, Ord, Show)
 
 data HNumsL  = L00 | L01 | L02 | L03 | L04 | L05
              | L06 | L07 | L08 | L09 | L10 | L11
@@ -21,7 +27,7 @@ data HNumsL  = L00 | L01 | L02 | L03 | L04 | L05
              | L24 | L25 | L26 | L27 | L28 | L29
              | L30 | L31 | L32 | L33 | L34 | L35
              | L36
-  deriving (Enum, Eq, Ord)
+  deriving (Enum, Eq, Ord, Show)
 
 data HTape hdata = HTape {
     tapeId         :: hdata
@@ -43,12 +49,14 @@ hCAlfabet  = [ '0', '1', '2', '3', '4', '5'
            , '_'
            ]
 
-instance Show HNums16 where
-  show a = [hCAlfabet !! fromEnum a]
+showHData :: Enum a => a -> String
+showHData a = [hCAlfabet !! fromEnum a]
 
-instance Show HNumsL where
-  show a = [hCAlfabet !! fromEnum a]
+showH :: Enum a => [a] -> String
+showH = foldl (\n a -> n <> showHData a) ""
 
+showHL :: Enum a => [[a]] -> [String]
+showHL = map showH
 
 
 instance NFData HNumsL where 

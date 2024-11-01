@@ -19,6 +19,7 @@ import qualified Code.HomaCode as HC
 import Code.HomaCodeData
 import Code.HomaCodeParallel
 
+
 -- import Data.Maybe
 -- import qualified Monomer.Lens as L
 -- import Monomer.Core.Lens (HasFontSize(fontSize))
@@ -181,12 +182,12 @@ handleEvent _ _ model evt =
     decodeTR = transpose $ map HC.decode incodeTR
 
 
-main :: IO ()
-main = do
-  print $ getStarter (HC.getArr @HNumsL "ANDREW")
-
 main' :: IO ()
 main' = do
+  print $ showHL $ getStarter (HC.getArr @HNumsL "ANDREW")
+
+main :: IO ()
+main = do
     startApp model handleEvent buildUI config
   where
     config = [

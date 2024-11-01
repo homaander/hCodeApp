@@ -29,8 +29,8 @@ class (Ord a, Show a) => Math a where
 
 
 class Math a => HData a where
-  (^<<) :: a -> Int -> a
-  (^>>) :: a -> Int -> a
+  (<^<) :: a -> Int -> a
+  (>^>) :: a -> Int -> a 
 
   fromHData   ::  a  -> Int
   toHData     :: Int ->  a
@@ -40,8 +40,8 @@ class Math a => HData a where
 
 
 class HData a => Code a where
-  (^->) :: a -> Int -> a
-  (^<-) :: a -> Int -> a
+  (-^>) :: a -> Int -> a
+  (<^-) :: a -> Int -> a
 
   code       ::  a  -> a
   codeN      :: Int -> a ->  a
@@ -58,8 +58,8 @@ class HData a => Code a where
   getPreset :: Int -> Int -> [a]
 
   -- default
-  (^->)  = flip codeN
-  (^<-)  = flip decodeN
+  (-^>)  = flip codeN
+  (<^-)  = flip decodeN
 
   codeN     n hdata = iterate code hdata !! n
   codeNList n ihd   = take n $ iterate code (code ihd)
@@ -142,15 +142,15 @@ instance (Enum a, Math a) => HData [a] where
     where
       pre = n - length dat
 
-  dat ^<< n = drop n dat <> replicate n zero
-  dat ^>> n =  replicate n zero <> take (length dat - n) dat
+  dat <^< n = drop n dat <> replicate n zero
+  dat >^> n =  replicate n zero <> take (length dat - n) dat
 
 
 -- Code 
 instance (Enum a, Math a) => Code [a] where
-  code d = reverse $ zipWith (^-) d (d ^>> 1)
+  code d = reverse $ zipWith (^-) d (d >^> 1)
 
-  decode d = reverse [foldl (^+) zero (d ^<< a) | a <- [0 .. length d - 1]]
+  decode d = reverse [foldl (^+) zero (d <^< a) | a <- [0 .. length d - 1]]
 
   findOffsetMaybe ihd hdata = if res == maxlen then Nothing else Just res
     where
@@ -166,7 +166,7 @@ instance (Enum a, Math a) => Code [a] where
                 | otherwise = map (codeN   (a - 1)) preset
     where
       st = setLength n [neg $ toEnum 1, toEnum 1]
-      preset = map (st ^<<) [0 .. n - 1]
+      preset = map (st <^<) [0 .. n - 1]
 
   codePreset preset dat = map (foldl (^+) zero . (^* dat)) preset
 
