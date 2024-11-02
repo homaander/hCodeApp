@@ -6,9 +6,8 @@ module Code.HomaCodeData (
   , HTape (..)
   , hCAlfabet
 
-  , showHData
+  , toLetter
   , showH
-  , showHL
 ) where
 
 import Control.Parallel.Strategies
@@ -49,14 +48,11 @@ hCAlfabet  = [ '0', '1', '2', '3', '4', '5'
            , '_'
            ]
 
-showHData :: Enum a => a -> String
-showHData a = [hCAlfabet !! fromEnum a]
+toLetter :: Enum a => a -> String
+toLetter a = [hCAlfabet !! fromEnum a]
 
 showH :: Enum a => [a] -> String
-showH = foldl (\n a -> n <> showHData a) ""
-
-showHL :: Enum a => [[a]] -> [String]
-showHL = map showH
+showH  = foldl (\n a -> n <> toLetter a) ""
 
 
 instance NFData HNumsL where 

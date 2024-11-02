@@ -23,7 +23,7 @@ import qualified Data.Text as T
 class (Show a, Enum a, Code [a]) => Arr a where
   showArr :: [a] -> Text
   showArr [] = ""
-  showArr arr = foldl (\r a -> r <> T.pack (showHData a)) "" arr
+  showArr arr = foldl (\r a -> r <> T.pack (toLetter a)) "" arr
 
   fakeRead :: Char -> a
 
@@ -78,7 +78,7 @@ instance Arr HNumsL where
 -- "584C32"
 
 --   Кодирование через пресет
--- >>> showHL $ getPreset @[HNums16] 6 66
+-- >>> map showH $ getPreset @[HNums16] 6 66
 -- >>> showH $ codePreset (getPreset @[HNums16] 6 66) [H12,H02,H13,H03,H14,H04]
 -- ["02819A","2831B3","831DB4","11DB6C","9BB6CE","A34CEE"]
 -- "584C32"
@@ -94,7 +94,7 @@ instance Arr HNumsL where
 -- "323BB5"
 
 --   Декодирование через пресет
--- >>> showHL $  getPreset @[HNums16] 6 (-66)
+-- >>> map showH $  getPreset @[HNums16] 6 (-66)
 -- >>> showH  $ codePreset (getPreset 6 (-66)) [H12,H02,H13,H03,H14,H04]
 -- ["DC9CD0","C686CD","983869","C68352","DC65FE","0D92EB"]
 -- "323BB5"

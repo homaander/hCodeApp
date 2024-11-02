@@ -184,7 +184,7 @@ handleEvent _ _ model evt =
 
 main' :: IO ()
 main' = do
-  print $ showHL $ getStarter (HC.getArr @HNumsL "ANDREW")
+  print $ map showH $ getStarter (HC.getArr @HNumsL "ANDREW")
 
 main :: IO ()
 main = do
