@@ -48,11 +48,11 @@ hCAlfabet  = [ '0', '1', '2', '3', '4', '5'
            , '_'
            ]
 
-toLetter :: Enum a => a -> String
-toLetter a = [hCAlfabet !! fromEnum a]
+toLetter :: Enum a => a -> Char
+toLetter a = hCAlfabet !! fromEnum a
 
 showH :: Enum a => [a] -> String
-showH  = foldl (\n a -> n <> toLetter a) ""
+showH  = foldl (\n a -> n <> [toLetter a]) ""
 
 
 instance NFData HNumsL where 

@@ -25,7 +25,7 @@ import Data.Text
 
 defaultTest :: Text -> ([HNumsL], Int)
 defaultTest x = (HC.getTapeId y, HC.getTapeLength y)
-  where y = HC.getArr x :: [HNumsL]
+  where y = HC.getHCT x :: [HNumsL]
 
 
 -- Strategy
@@ -45,7 +45,7 @@ evalTest t = runEval $ do
   b <- rpar (f2 x)
   return (a, b)
   where
-    x = HC.getArr t :: [HNumsL]
+    x = HC.getHCT t :: [HNumsL]
     f1 = HC.getTapeId
     f2 = HC.getTapeLength
 
@@ -57,14 +57,14 @@ evalTest2 t = runEval $ do
   _ <- rseq b
   return (a, b)
   where
-    x = HC.getArr t :: [HNumsL]
+    x = HC.getHCT t :: [HNumsL]
     f1 = HC.getTapeId
     f2 = HC.getTapeLength
 
 evalTest3 :: Text -> ([HNumsL], Int)
 evalTest3 t = (f1 x, f2 x) `using` firstStrat
   where
-    x = HC.getArr t :: [HNumsL]
+    x = HC.getHCT t :: [HNumsL]
     f1 = HC.getTapeId
     f2 = HC.getTapeLength
 

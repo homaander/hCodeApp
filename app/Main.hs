@@ -162,14 +162,14 @@ handleEvent _ _ model evt =
     codeNVal = model ^. codeNC
 
     dataV = case typeVal of
-      "HNumsL"  -> HC.dataText codeNVal (HC.getArr @HNumsL  codeVal)
-      "HNums16" -> HC.dataText codeNVal (HC.getArr @HNums16 codeVal)
-      _         -> HC.dataText codeNVal (HC.getArr @Int     codeVal)
+      "HNumsL"  -> HC.dataText codeNVal (HC.getHCT @HNumsL  codeVal)
+      "HNums16" -> HC.dataText codeNVal (HC.getHCT @HNums16 codeVal)
+      _         -> HC.dataText codeNVal (HC.getHCT @Int     codeVal)
 
     tapeV = case typeVal of
-      "HNumsL"  -> HC.tapeText $ HC.toTape (HC.getArr @HNumsL  codeVal)
-      "HNums16" -> HC.tapeText $ HC.toTape (HC.getArr @HNums16 codeVal)
-      _         -> HC.tapeText $ HC.toTape (HC.getArr @Int     codeVal)
+      "HNumsL"  -> HC.tapeText $ HC.toTape (HC.getHCT @HNumsL  codeVal)
+      "HNums16" -> HC.tapeText $ HC.toTape (HC.getHCT @HNums16 codeVal)
+      _         -> HC.tapeText $ HC.toTape (HC.getHCT @Int     codeVal)
 
     -- Table Code / Decode
     incodeT  = model ^. codeTable
@@ -182,9 +182,9 @@ handleEvent _ _ model evt =
     decodeTR = transpose $ map HC.decode incodeTR
 
 
-main' :: IO ()
-main' = do
-  print $ map showH $ getStarter (HC.getArr @HNumsL "ANDREW")
+-- main :: IO ()
+-- main = do
+--   print $ map showH $ getStarter (HC.getHCT @HNumsL "ANDREW")
 
 main :: IO ()
 main = do

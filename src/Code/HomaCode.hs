@@ -21,21 +21,22 @@ import qualified Data.Text as T
 
 
 class (Show a, Enum a, Code [a]) => Arr a where
-  showArr :: [a] -> Text
-  showArr [] = ""
-  showArr arr = foldl (\r a -> r <> T.pack (toLetter a)) "" arr
+  showHCT :: [a] -> Text
+  getHCT  :: Text -> [a]
 
   fakeRead :: Char -> a
 
-  -- default
-  getArr :: Text -> [a]
-  getArr arr = map fakeRead $ T.unpack arr
-
   dataText :: Int -> [a] -> (Text, Text)
-  dataText n t = ((showArr . decodeN n) t, (showArr . codeN n) t)
+
+  tapeText t = HTape (showHCT $ tapeId t) (tapeOffset t) (tapeAntiOffset t) (tapeLength t)
+
+  -- default
+  showHCT arr = T.pack $ showH arr
+  getHCT  arr = map fakeRead $ T.unpack arr
+
+  dataText n t = ((showHCT . decodeN n) t, (showHCT . codeN n) t)
 
   tapeText :: HTape [a] -> HTape Text
-  tapeText t = HTape (showArr $ tapeId t) (tapeOffset t) (tapeAntiOffset t) (tapeLength t)
 
 
 instance Arr Int where
