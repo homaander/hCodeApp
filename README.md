@@ -1,8 +1,13 @@
 # hCodeApp
 
-R ([567] ^- [056]) = [115]
+***[Документация HCode](https://github.com/homaander/reference/blob/master/help/hcode/main.md)***
 
-[115] -> 1 + map (^+) [15]
-         1 + map (^+) [5]
-         5 + map (^+) []
+```haskell
+import HomaCode
+
+-- Test
+main :: IO ()
+main = do
+  putStrLn $ code [1,2,3,4]
+```
 
