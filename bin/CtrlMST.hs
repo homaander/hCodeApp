@@ -1,10 +1,4 @@
-module CtrlMST (
-    MList(..)
-  , Node (..)
-  , empty
-  , prepend
-  , toList
-) where
+module CtrlMST where
 
 import Data.STRef
 import Data.Maybe

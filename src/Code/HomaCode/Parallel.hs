@@ -1,4 +1,4 @@
-module Code.HomaCodeParallel (
+module Code.HomaCode.Parallel (
    getTapeIdParallel
  , getOffsetParallel
  , getStarter
@@ -7,7 +7,7 @@ module Code.HomaCodeParallel (
 ) where
 
 import qualified Code.HomaCode as HC
-import Code.HomaCodeData
+import Code.HomaCode.Data
 
 import Control.Parallel.Strategies
 -- import Control.DeepSeq
@@ -22,7 +22,7 @@ preset2_5M :: [[HNumsL]]
 preset2_5M = map HC.getHCT ["_DOD_5","DNQNI4","OQMVSH","DNVRU4","_ISU3H","54H4HG"]
 
 getStarter :: [HNumsL] -> [[HNumsL]]
-getStarter a = take 10 $ iterate (HC.codePreset preset2_5M) a
+getStarter a = take 10 $ iterate (HC.runPreset preset2_5M) a
 
 
 getTapeIdParallel :: [HNumsL] -> [Int] -> [HNumsL]

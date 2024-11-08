@@ -15,9 +15,9 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import TextShow ( TextShow(showt) )
 
+import Code.HomaCode.Data
 import qualified Code.HomaCode as HC
-import Code.HomaCodeData
-import Code.HomaCodeParallel
+import Code.HomaCode.Parallel
 
 
 -- import Data.Maybe
@@ -184,7 +184,7 @@ handleEvent _ _ model evt =
 
 -- main :: IO ()
 -- main = do
---   print $ map showH $ getStarter (HC.getHCT @HNumsL "ANDREW")
+--   print $ map showHCode $ getStarter (HC.getHCT @HNumsL "ANDREW")
 
 main :: IO ()
 main = do

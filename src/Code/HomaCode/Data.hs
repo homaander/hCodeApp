@@ -1,13 +1,14 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module Code.HomaCodeData (
+module Code.HomaCode.Data (
     HNums16(..)
   , HNumsL (..)
   , HTape (..)
-  , hCAlfabet
 
   , toLetter
-  , showH
+  , showHCode
+
+  , hcodeAlfebet
 ) where
 
 import Control.Parallel.Strategies
@@ -24,35 +25,27 @@ data HNumsL  = L00 | L01 | L02 | L03 | L04 | L05
              | L12 | L13 | L14 | L15 | L16 | L17
              | L18 | L19 | L20 | L21 | L22 | L23
              | L24 | L25 | L26 | L27 | L28 | L29
-             | L30 | L31 | L32 | L33 | L34 | L35
-             | L36
+             | L30 | L31 | L32 | L33 | L34 | L35 | L36
   deriving (Enum, Eq, Ord, Show)
 
-data HTape hdata = HTape {
-    tapeId         :: hdata
-  , tapeOffset     :: Int
-  , tapeAntiOffset :: Int
-  , tapeLength     :: Int
-}
+data HTape hdata = HTape { tapeId         :: hdata
+                         , tapeOffset     :: Int
+                         , tapeAntiOffset :: Int
+                         , tapeLength     :: Int }
   deriving Show
 
 
 
-hCAlfabet :: [Char]
-hCAlfabet  = [ '0', '1', '2', '3', '4', '5'
-           , '6', '7', '8', '9', 'A', 'B'
-           , 'C', 'D', 'E', 'F', 'G', 'H'
-           , 'I', 'J', 'K', 'L', 'M', 'N'
-           , 'O', 'P', 'Q', 'R', 'S', 'T'
-           , 'U', 'V', 'W', 'X', 'Y', 'Z'
-           , '_'
-           ]
+hcodeAlfebet :: String
+hcodeAlfebet  =  "0123456789AB"
+           <> "CDEFGHIJKLMN"
+           <> "OPQRSTUVWXYZ_"
 
 toLetter :: Enum a => a -> Char
-toLetter a = hCAlfabet !! fromEnum a
+toLetter a = hcodeAlfebet !! fromEnum a
 
-showH :: Enum a => [a] -> String
-showH  = foldl (\n a -> n <> [toLetter a]) ""
+showHCode :: Enum a => [a] -> String
+showHCode  = foldl (\n a -> n <> [toLetter a]) ""
 
 
 instance NFData HNumsL where 
