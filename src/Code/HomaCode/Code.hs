@@ -2,26 +2,27 @@
 
 module Code.HomaCode.Code (Code(..)) where
 
+import Code.HomaCode.Data
 import Code.HomaCode.Math
 import Code.HomaCode.HData
 
 class HData a => Code a where
-  (-^>) :: a -> Int -> a
-  (<^-) :: a -> Int -> a
+  (-^>) :: [a] -> Int -> [a]
+  (<^-) :: [a] -> Int -> [a]
 
-  getPreset  :: Int -> Int -> [a]
-  runPreset :: [a] -> a ->  a
+  getPreset :: Int -> Int  -> Int -> [[a]]
+  runPreset :: [[a]] -> [a] ->  [a]
 
-  code       ::  a  -> a
-  codeN      :: Int -> a ->  a
-  codeNList  :: Int -> a -> [a]
-  codeR      ::  a  -> a
+  code       :: [a] -> [a]
+  codeN      :: Int -> [a] ->  [a]
+  codeNList  :: Int -> [a] -> [[a]]
+  codeR      :: [a] -> [a]
 
-  decode  ::  a  -> a
-  decodeN :: Int -> a -> a
+  decode  ::  [a] -> [a]
+  decodeN ::  Int -> [a] -> [a]
 
-  findOffset :: a -> a -> Maybe Int
-  findList   :: a -> a -> Maybe [a]
+  findOffset :: [a] -> [a] -> Maybe Int
+  findList   :: [a] -> [a] -> Maybe [[a]]
 
 
   -- default
@@ -36,26 +37,51 @@ class HData a => Code a where
   decodeN n hdata = iterate decode hdata !! n
 
 
+instance Code HNum where
+  code d = reverse $ d ^- (d >^> 1)
 
-instance (Enum a, Math a) => Code [a] where
-  code d = reverse $ zipWith (^-) d (d >^> 1)
+  decode d = reverse [foldl (^+) (HN (hBase $ head d) 0) (d <^< a) | a <- [0 .. length d - 1]]
 
-  decode d = reverse [foldl (^+) zero (d <^< a) | a <- [0 .. length d - 1]]
-
+  findOffset [] _ = Nothing
   findOffset ihd hdata = if res == maxlen then Nothing else Just res
     where
       res         = foldr finder 0 (codeNList maxlen ihd)
       finder he n = if he == hdata then 1 else n + 1
-      maxlen      = notation @a ^ length ihd
+      maxlen      = hBase (head ihd) ^ length ihd
 
   findList ihd hdata = do
     off <- findOffset ihd hdata
     pure $ ihd : codeNList off ihd
 
-  getPreset n a | a <= 0    = map (decodeN (1 - a)) preset
-                | otherwise = map (codeN   (a - 1)) preset
+  getPreset b n a | a <= 0    = map (decodeN (1 - a)) preset
+                  | otherwise = map (codeN   (a - 1)) preset
     where
-      st = setLength n [neg $ toEnum 1, toEnum 1]
+      st = setLength n [neg $ HN b 1, HN b 1]
       preset = map (st <^<) [0 .. n - 1]
 
-  runPreset preset dat = map (foldl (^+) zero . (^* dat)) preset
+      setLength nN dat = replicate pre (HN b 0) <> dat
+        where
+          pre = nN - length dat
+
+  runPreset preset dat = map (foldl (^+) (HN (hBase $ head dat) 0) . (^* dat)) preset
+
+-- >>> [HN 10 1, HN 10 2] <^< 1
+-- [HN {hBase = 10, hVal = 2},HN {hBase = 10, hVal = 0}]
+
+-- >>> [HN 10 2, HN 10 4] ^- [HN 10 9, HN 10 2]
+-- [HN {hBase = 10, hVal = 3},HN {hBase = 10, hVal = 2}]
+
+-- >>> neg $ HN 10 0
+-- HN {hBase = 10, hVal = 0}
+
+-- >>> zipWith (^-) [HN 10 2, HN 10 4] ([HN 10 9, HN 10 2] >^> 1)
+-- [HN {hBase = 10, hVal = 2},HN {hBase = 10, hVal = 5}]
+
+-- >>> [HN 10 2, HN 10 4] ^- ([HN 10 9, HN 10 2] >^> 1)
+-- [HN {hBase = 10, hVal = 2},HN {hBase = 10, hVal = 5}]
+
+-- >>> code @HNum [HN 10 1, HN 10 2]
+-- [HN {hBase = 10, hVal = 1},HN {hBase = 10, hVal = 1}]
+
+-- >>> map showHCode $ getPreset @HNum 20 5 666
+-- ["8HB02","HJHD2","BH1JD","0DJ1A","22DAI"]

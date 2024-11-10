@@ -1,19 +1,18 @@
 module Code.HomaCode.Tape (Tape(..)) where
 
-import Code.HomaCode.Code
-import Code.HomaCode.Math
 import Code.HomaCode.Data
+import Code.HomaCode.Code
 
 
 import Data.Maybe (fromJust)
 
 class (Ord a, Code a) => Tape a where
-  toTape   :: a -> HTape a
-  fromTape :: HTape a -> a
+  toTape   :: [a] -> HTape [a]
+  fromTape :: HTape [a] -> [a]
 
-  getTapeId     :: a -> a
-  getTapeLength :: a -> Int
-  getTapeList   :: a -> [a]
+  getTapeId     :: [a] -> [a]
+  getTapeLength :: [a] -> Int
+  getTapeList   :: [a] -> [[a]]
 
   -- default
   fromTape (HTape h n _ _) = codeN n h
@@ -24,10 +23,13 @@ class (Ord a, Code a) => Tape a where
   getTapeList   hdata = fromJust $ findList   hdata hdata
 
 
-instance (Ord a, Enum a, Math a) => Tape [a] where
+instance Tape HNum where
   toTape hdata = HTape hid offset (len - offset) len
     where
       offset  = if offset' /= len then offset' else 0
       offset' = fromJust $ findOffset hid hdata
       len     = getTapeLength hdata
       hid     = getTapeId     hdata
+
+-- >>> toTape [HN 16 12,HN 16 2,HN 16 13,HN 16 3,HN 16 14,HN 16 4]
+-- HTape {tapeId = [HN {hBase = 10, hVal = 0},HN {hBase = 10, hVal = 1}], tapeOffset = 59, tapeAntiOffset = 1, tapeLength = 60}

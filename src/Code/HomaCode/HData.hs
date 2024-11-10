@@ -1,35 +1,31 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Code.HomaCode.HData (HData(..)) where
 
+import Code.HomaCode.Data
 import Code.HomaCode.Math
 
 class Math a => HData a where
-  (<^<) :: a -> Int -> a
-  (>^>) :: a -> Int -> a 
+  (<^<) :: [a] -> Int -> [a]
+  (>^>) :: [a] -> Int -> [a]
 
-  fromHData   ::  a  -> Int
-  toHData     :: Int ->  a
-  toHDataN    :: Int -> Int -> a
-
-  setLength   :: Int ->  a  -> a
+  fromHData   :: [a] -> Int
+  toHData     :: Int -> [a]
 
 
-instance (Enum a, Math a) => HData [a] where
-  fromHData hdata = sum $ zipWith (*) (map fromEnum hdata) powArr
+instance HData HNum where
+  dat <^< n = drop n dat <> replicate n (HN (hBase $ head dat) 0)
+
+  dat >^> n =  replicate n (HN (hBase $ head dat) 0) <> take (length dat - n) dat
+
+  fromHData [] = 0
+  fromHData hdata@(hf:_) = sum $ zipWith (*) (map hVal hdata) powArr
     where
-      powArr = map (notation @a ^) powLen
-      powLen = reverse [0 .. length hdata - 1]
-  toHData num = map (toEnum . (`mod` notation @a) . div num) powArr
-    where
-      powArr = map (notation @a ^) powLen
-      powLen = reverse [0 .. len - 1]
-      len    = ceiling @Double @Int $ logBase (fromIntegral $ notation @a) (fromIntegral num)
-  toHDataN count num = setLength count $ toHData num
+      powArr = map (hBase hf ^) $ reverse [0 .. length hdata - 1]
 
-  setLength n dat = replicate pre zero <> dat
+  toHData num = map (HN 10 . (`mod` 10) . div num) powArr
     where
-      pre = n - length dat
+      powArr = map (10 ^) $ reverse [0 .. len - 1]
+      len    = ceiling @Double @Int $ logBase 10 (fromIntegral num)
 
-  dat <^< n = drop n dat <> replicate n zero
-  dat >^> n =  replicate n zero <> take (length dat - n) dat

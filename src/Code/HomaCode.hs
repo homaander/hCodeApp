@@ -8,7 +8,13 @@ module Code.HomaCode (
   , Tape(..)
   , TapeInfo(..)
 
-  , Arr(..)
+  , tapeText
+  , getHCT
+  , dataText
+  , showHCodeT
+  , fakeRead
+
+  -- , Arr(..)
 ) where
 
 import Code.HomaCode.Data
@@ -24,40 +30,19 @@ import Data.Maybe ( fromMaybe )
 import Data.Text (Text)
 import qualified Data.Text as T
 
+tapeText :: HTape [HNum] -> HTape Text
+tapeText t = HTape (showHCodeT $ tapeId t) (tapeOffset t) (tapeAntiOffset t) (tapeLength t)
 
+getHCT :: Int -> Text -> [HNum]
+getHCT n arr = map (fakeRead n) $ T.unpack arr
 
-class (Show a, Enum a, Code [a]) => Arr a where
-  showHCodeT :: [a] -> Text
-  getHCT  :: Text -> [a]
+dataText :: Int -> [HNum] -> (Text, Text)
+dataText n t = ((showHCodeT . decodeN n) t, (showHCodeT . codeN n) t)
 
-  fakeRead :: Char -> a
+showHCodeT :: [HNum] -> Text
+showHCodeT arr = T.pack $ showHCode arr
 
-  dataText :: Int -> [a] -> (Text, Text)
-
-  tapeText t = HTape (showHCodeT $ tapeId t) (tapeOffset t) (tapeAntiOffset t) (tapeLength t)
-
-  -- default
-  showHCodeT arr = T.pack $ showHCode arr
-  getHCT  arr = map fakeRead $ T.unpack arr
-
-  dataText n t = ((showHCodeT . decodeN n) t, (showHCodeT . codeN n) t)
-
-  tapeText :: HTape [a] -> HTape Text
-
-
-instance Arr Int where
-  fakeRead a = fromMaybe 0 $
+fakeRead :: Int -> Char -> HNum
+fakeRead n a = HN n $ fromMaybe 0 $
                elemIndex a $
-               take (notation @Int) hcodeAlfebet
-
-instance Arr HNums16 where
-  fakeRead a = toEnum $
-               fromMaybe 0 $
-               elemIndex a $
-               take (notation @HNums16) hcodeAlfebet
-
-instance Arr HNumsL where
-  fakeRead a = toEnum $
-               fromMaybe 0 $
-               elemIndex a $
-               take (notation @HNumsL) hcodeAlfebet
+               take n hcodeAlfebet

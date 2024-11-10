@@ -78,7 +78,7 @@ buildUI _ model = widgetTree where
           , numericField codeNC `styleBasic` [textCenter]
           , spacer
           , hgrid [
-                dropdown selectDataType ["Int", "HNums16", "HNumsL"] label label
+                dropdown selectDataType ["10", "16", "Alf"] label label
               , button "<----" AppDecode
               , button "---->" AppCode
               ]
@@ -148,10 +148,10 @@ handleEvent _ _ model evt =
                        & tapeInfoAntiOffset .~ tapeAntiOffset tapeV
                        & tapeInfoLength     .~ tapeLength     tapeV
                        ]
-    AppTUp      -> [ Model $ model & codeTable .~ decodeTR ]
-    AppTLeft    -> [ Model $ model & codeTable .~ decodeT  ]
-    AppTDown    -> [ Model $ model & codeTable .~ codeTR   ]
-    AppTRight   -> [ Model $ model & codeTable .~ codeT    ]
+    AppTUp      -> [ Model $ model {-- & codeTable .~ decodeTR --}]
+    AppTLeft    -> [ Model $ model {-- & codeTable .~ decodeT  --}]
+    AppTDown    -> [ Model $ model {-- & codeTable .~ codeTR   --}]
+    AppTRight   -> [ Model $ model {-- & codeTable .~ codeT    --}]
 
     AppToTable   -> [ Model model ]
     AppFromTable -> [ Model model]
@@ -162,17 +162,17 @@ handleEvent _ _ model evt =
     codeNVal = model ^. codeNC
 
     dataV = case typeVal of
-      "HNumsL"  -> HC.dataText codeNVal (HC.getHCT @HNumsL  codeVal)
-      "HNums16" -> HC.dataText codeNVal (HC.getHCT @HNums16 codeVal)
-      _         -> HC.dataText codeNVal (HC.getHCT @Int     codeVal)
+      "Alf" -> HC.dataText codeNVal (HC.getHCT 37 codeVal)
+      "16"  -> HC.dataText codeNVal (HC.getHCT 16 codeVal)
+      _     -> HC.dataText codeNVal (HC.getHCT 10 codeVal)
 
     tapeV = case typeVal of
-      "HNumsL"  -> HC.tapeText $ HC.toTape (HC.getHCT @HNumsL  codeVal)
-      "HNums16" -> HC.tapeText $ HC.toTape (HC.getHCT @HNums16 codeVal)
-      _         -> HC.tapeText $ HC.toTape (HC.getHCT @Int     codeVal)
+      "Alf" -> HC.tapeText $ HC.toTape (HC.getHCT 37 codeVal)
+      "16"  -> HC.tapeText $ HC.toTape (HC.getHCT 16 codeVal)
+      _     -> HC.tapeText $ HC.toTape (HC.getHCT 10 codeVal)
 
     -- Table Code / Decode
-    incodeT  = model ^. codeTable
+    incodeT  = map (map (HN 10)) $ model ^. codeTable
     incodeTR = transpose incodeT
 
     codeT   = map HC.code   incodeT
