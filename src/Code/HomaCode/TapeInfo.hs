@@ -14,7 +14,7 @@ class Tape a => TapeInfo a where
   getSumsList :: a -> a -> [a]
   getOfsetsSums :: a -> a -> a ->  [(Int,Int)]
 
-instance (Enum a, Math a) => TapeInfo [a] where
+instance (Ord a, Enum a, Math a) => TapeInfo [a] where
   getSumsList aTape bTape = nub $ map (\n -> getTapeId (aTape ^+ codeN n bTape)) [0 .. 500]
 
   getOfsetsSums aTape bTape resTape = mapMaybe check [0 .. 500]

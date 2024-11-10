@@ -7,7 +7,7 @@ import Code.HomaCode.Data
 
 import Data.Maybe (fromJust)
 
-class Code a => Tape a where
+class (Ord a, Code a) => Tape a where
   toTape   :: a -> HTape a
   fromTape :: HTape a -> a
 
@@ -24,7 +24,7 @@ class Code a => Tape a where
   getTapeList   hdata = fromJust $ findList   hdata hdata
 
 
-instance (Enum a, Math a) => Tape [a] where
+instance (Ord a, Enum a, Math a) => Tape [a] where
   toTape hdata = HTape hid offset (len - offset) len
     where
       offset  = if offset' /= len then offset' else 0
