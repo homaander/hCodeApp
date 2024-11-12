@@ -7,6 +7,9 @@ module Code.HomaCode.Data (
   , toLetter
   , showHCode
 
+  , HBase
+  , HVal
+
   , hcodeAlfebet
 ) where
 

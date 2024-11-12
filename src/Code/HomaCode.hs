@@ -13,6 +13,7 @@ module Code.HomaCode (
   , dataText
   , showHCodeT
   , fakeRead
+  , setBaseForce
 
   -- , Arr(..)
 ) where
@@ -41,6 +42,9 @@ dataText n t = ((showHCodeT . decodeN n) t, (showHCodeT . codeN n) t)
 
 showHCodeT :: [HNum] -> Text
 showHCodeT arr = T.pack $ showHCode arr
+
+setBaseForce :: HBase -> [HNum] -> [HNum]
+setBaseForce b = map (\(HN _ v) -> HN b v)
 
 fakeRead :: Int -> Char -> HNum
 fakeRead n a = HN n $ fromMaybe 0 $

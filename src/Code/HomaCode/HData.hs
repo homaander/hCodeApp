@@ -11,7 +11,17 @@ class Math a => HData a where
   (>^>) :: [a] -> Int -> [a]
 
   fromHData   :: [a] -> Int
-  toHData     :: Int -> [a]
+  toHData     :: HBase -> Int -> [a]
+  toHDataN    :: Int -> HBase -> Int -> [a]
+
+  setLength :: HBase -> Int -> [a] -> [a]
+
+  setBase :: Int -> HBase -> [a] -> [a]
+
+  -- default
+  toHDataN l b dat = setLength b l $ toHData b dat
+
+  setBase l b dat = toHDataN l b $ fromHData dat
 
 
 instance HData HNum where
@@ -24,8 +34,10 @@ instance HData HNum where
     where
       powArr = map (hBase hf ^) $ reverse [0 .. length hdata - 1]
 
-  toHData num = map (HN 10 . (`mod` 10) . div num) powArr
+  toHData b num = map (HN b . (`mod` b) . div num) powArr
     where
       powArr = map (10 ^) $ reverse [0 .. len - 1]
-      len    = ceiling @Double @Int $ logBase 10 (fromIntegral num)
+      len    = ceiling @Double @Int $ logBase (fromIntegral b) (fromIntegral num)
+
+  setLength b nN dat = replicate (nN - length dat) (HN b 0) <> dat
 

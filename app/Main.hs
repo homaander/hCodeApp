@@ -17,7 +17,7 @@ import TextShow ( TextShow(showt) )
 
 import Code.HomaCode.Data
 import qualified Code.HomaCode as HC
-import Code.HomaCode.Parallel
+-- import Code.HomaCode.Parallel
 
 
 -- import Data.Maybe
@@ -26,12 +26,12 @@ import Code.HomaCode.Parallel
 
 data AppModel = AppModel {
       _codeText           :: Text
-    , _codeTable          :: [[Int]]
+    , _codeTable          :: [[HNum]]
 
     , _codeNC             :: Int
 
-    , _selectDataType     :: Text
-    , _selectColumnNum    :: Int
+    , _selectDataBase     :: HBase
+    , _selectRowNum       :: Int
 
     , _tapeInfoId         :: Text
     , _tapeInfoOffset     :: Int
@@ -66,29 +66,26 @@ type AppEventResp' = AppEventResponse AppModel AppEvent
 buildUI :: WidgetEnv' -> AppModel -> WidgetNode'
 buildUI _ model = widgetTree where
   widgetTree = vstack
-    [ label "H_Code" `styleBasic` [ textSize 32 ]
+    [ 
+      label "H_Code" `styleBasic` [ textSize 32 ]
+    , spacer
+
+    -- , label $ T.pack $ show incodeT
 
     , label "Default code:"
     , spacer
 
     , hgrid [
         vstack [
-            textField codeText `styleBasic` [textCenter]
+            numericField codeNC `styleBasic` [textCenter]
+          , dropdown selectDataBase [10, 16, 37] (\sRow -> hstack [ label "Base: ", label $ showt sRow ]) (label . showt)
           , spacer
-          , numericField codeNC `styleBasic` [textCenter]
-          , spacer
+          , textField codeText `styleBasic` [textCenter]
           , hgrid [
-                dropdown selectDataType ["10", "16", "Alf"] label label
-              , button "<----" AppDecode
+                button "<----" AppDecode
               , button "---->" AppCode
               ]
                 `styleBasic` [width 300]
-          , spacer
-          , hgrid [
-                dropdown selectColumnNum [1 .. 5] (\sRow -> hstack [ label "Row: ", label $ showt sRow ]) (label . showt)
-              , button "To   T"   AppToTable
-              , button "From T" AppFromTable
-              ]
           ]
             `styleBasic` [paddingH 10, width 300]
       , vstack [
@@ -115,12 +112,22 @@ buildUI _ model = widgetTree where
     ]
 
     , spacer
+    , spacer
     , label "Table:"
     , spacer
 
     , hgrid [
-          vstack [ hgrid [ label (showt a) `styleBasic` [textSize 20, textCenter] | a <- b ] | b <- model ^. codeTable ]
-            `styleBasic` [paddingH 40, width 200]
+
+        vstack [
+            hgrid [
+              dropdown selectRowNum [1 .. 5] (\sRow -> hstack [ label "Row: ", label $ showt sRow ]) (label . showt)
+            , button "To   T"   AppToTable
+            , button "From T" AppFromTable
+            ]
+          , spacer
+          , box_ [alignCenter] (vstack [ hgrid [ label (T.pack $ mconcat [[toLetter a] <> " " | a <- b]) `styleBasic` [textSize 20] ] | b <- incodeT])
+              `styleBasic` [paddingH 40, width 200]
+          ]
 
         , vstack [
               button "Up"   AppTUp
@@ -133,6 +140,8 @@ buildUI _ model = widgetTree where
         ]
     ]
       `styleBasic` [ padding 10 ]
+
+  incodeT = model ^. codeTable
 
 
 
@@ -148,39 +157,34 @@ handleEvent _ _ model evt =
                        & tapeInfoAntiOffset .~ tapeAntiOffset tapeV
                        & tapeInfoLength     .~ tapeLength     tapeV
                        ]
-    AppTUp      -> [ Model $ model {-- & codeTable .~ decodeTR --}]
-    AppTLeft    -> [ Model $ model {-- & codeTable .~ decodeT  --}]
-    AppTDown    -> [ Model $ model {-- & codeTable .~ codeTR   --}]
-    AppTRight   -> [ Model $ model {-- & codeTable .~ codeT    --}]
+    AppTDown    -> [ Model $ model & codeTable .~ fst dataTR ]
+    AppTUp      -> [ Model $ model & codeTable .~ snd dataTR ]
+    AppTRight   -> [ Model $ model & codeTable .~ fst dataT  ]
+    AppTLeft    -> [ Model $ model & codeTable .~ snd dataT  ]
 
-    AppToTable   -> [ Model model ]
-    AppFromTable -> [ Model model]
+    AppToTable   -> [ Model $ model & codeTable .~ incodeTUpdate ]
+    AppFromTable -> [ Model $ model & codeText  .~ HC.showHCodeT (incodeT !! (rowNum - 1)) ]
   where
     -- Code / Decode
-    typeVal  = model ^. selectDataType
+    baseVal  = model ^. selectDataBase
     codeVal  = model ^. codeText
     codeNVal = model ^. codeNC
 
-    dataV = case typeVal of
-      "Alf" -> HC.dataText codeNVal (HC.getHCT 37 codeVal)
-      "16"  -> HC.dataText codeNVal (HC.getHCT 16 codeVal)
-      _     -> HC.dataText codeNVal (HC.getHCT 10 codeVal)
+    rowNum = model ^. selectRowNum
 
-    tapeV = case typeVal of
-      "Alf" -> HC.tapeText $ HC.toTape (HC.getHCT 37 codeVal)
-      "16"  -> HC.tapeText $ HC.toTape (HC.getHCT 16 codeVal)
-      _     -> HC.tapeText $ HC.toTape (HC.getHCT 10 codeVal)
+    codeHN = HC.getHCT baseVal codeVal
+
+    dataV = HC.dataText codeNVal    codeHN
+    tapeV = HC.tapeText $ HC.toTape codeHN
 
     -- Table Code / Decode
-    incodeT  = map (map (HN 10)) $ model ^. codeTable
+    incodeT  = map (HC.setBaseForce baseVal) $ model ^. codeTable
     incodeTR = transpose incodeT
 
-    codeT   = map HC.code   incodeT
-    decodeT = map HC.decode incodeT
+    incodeTUpdate = take (rowNum - 1) incodeT <> [codeHN] <> drop rowNum incodeT
 
-    codeTR   = transpose $ map HC.code   incodeTR
-    decodeTR = transpose $ map HC.decode incodeTR
-
+    dataT  = (map HC.code incodeT, map HC.decode incodeT)
+    dataTR = (transpose $ map HC.code incodeTR, transpose $ map HC.decode incodeTR)
 
 -- main :: IO ()
 -- main = do
@@ -194,17 +198,25 @@ main = do
         appWindowTitle "H Code App"
       , appWindowIcon  "./assets/images/icon.png"
       , appTheme       darkTheme
-      , appFontDef     "Regular" "./assets/fonts/Roboto-Regular.ttf"
+      , appFontDef     "Regular" "./assets/fonts/FiraCode-Light.ttf"
       , appInitEvent   AppInit
       ]
-    model = AppModel
-              "12345"
-              [ [6,4,2,8,3]
-              , [2,4,5,7,6]
-              , [3,5,3,1,2]
-              , [9,9,2,4,6]
-              , [1,2,3,5,7]
-              ]
-              1 "Int" 1
-              "?????" 0 0 0
+
+    model = AppModel {
+        _codeText   = "12345"
+      , _tapeInfoId = "?????"
+      , _codeTable = [
+                       HC.toHDataN 5 10 13243
+                     , HC.toHDataN 5 10 67521
+                     , HC.toHDataN 5 10 43212
+                     , HC.toHDataN 5 10 98721
+                     , HC.toHDataN 5 10 84328
+                     ]
+      , _codeNC             = 1
+      , _selectDataBase     = 10
+      , _selectRowNum       = 1
+      , _tapeInfoLength     = 0
+      , _tapeInfoOffset     = 0
+      , _tapeInfoAntiOffset = 0
+      }
 

@@ -56,12 +56,8 @@ instance Code HNum where
   getPreset b n a | a <= 0    = map (decodeN (1 - a)) preset
                   | otherwise = map (codeN   (a - 1)) preset
     where
-      st = setLength n [neg $ HN b 1, HN b 1]
+      st = setLength b n [neg $ HN b 1, HN b 1]
       preset = map (st <^<) [0 .. n - 1]
-
-      setLength nN dat = replicate pre (HN b 0) <> dat
-        where
-          pre = nN - length dat
 
   runPreset preset dat = map (foldl (^+) (HN (hBase $ head dat) 0) . (^* dat)) preset
 
