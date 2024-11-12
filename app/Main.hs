@@ -206,11 +206,11 @@ main = do
         _codeText   = "12345"
       , _tapeInfoId = "?????"
       , _codeTable = [
-                       HC.toHDataN 5 10 13243
-                     , HC.toHDataN 5 10 67521
-                     , HC.toHDataN 5 10 43212
-                     , HC.toHDataN 5 10 98721
-                     , HC.toHDataN 5 10 84328
+                       HC.toHDataN 10 5 13243
+                     , HC.toHDataN 10 5 67521
+                     , HC.toHDataN 10 5 43212
+                     , HC.toHDataN 10 5 98721
+                     , HC.toHDataN 10 5 84328
                      ]
       , _codeNC             = 1
       , _selectDataBase     = 10

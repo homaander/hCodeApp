@@ -10,8 +10,9 @@ class HData a => Code a where
   (-^>) :: [a] -> Int -> [a]
   (<^-) :: [a] -> Int -> [a]
 
-  getPreset :: Int -> Int  -> Int -> [[a]]
-  runPreset :: [[a]] -> [a] ->  [a]
+  getPreset  :: HBase -> Int ->  Int  -> [[a]]
+  execPreset :: [[a]] -> [a] -> [[a]]
+  runPreset  :: [[a]] -> [a] ->  [a]
 
   code       :: [a] -> [a]
   codeN      :: Int -> [a] ->  [a]
@@ -60,6 +61,8 @@ instance Code HNum where
       preset = map (st <^<) [0 .. n - 1]
 
   runPreset preset dat = map (foldl (^+) (HN (hBase $ head dat) 0) . (^* dat)) preset
+
+  execPreset preset dat = map (^* dat) preset
 
 -- >>> [HN 10 1, HN 10 2] <^< 1
 -- [HN {hBase = 10, hVal = 2},HN {hBase = 10, hVal = 0}]
