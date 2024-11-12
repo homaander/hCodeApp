@@ -13,7 +13,7 @@ main = do
   -- HData
   --   Получение данных из числа
   test (showHCode $ toHData 10 1234) "1234"
-  test (showHCode $ toHData 16 1234) "CB2"
+  test (showHCode $ toHData 16 1234) "4D2"
 
 
   -- Code

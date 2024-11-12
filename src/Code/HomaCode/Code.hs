@@ -41,7 +41,7 @@ class HData a => Code a where
 instance Code HNum where
   code d = reverse $ d ^- (d >^> 1)
 
-  decode d = reverse [foldl (^+) (HN (hBase $ head d) 0) (d <^< a) | a <- [0 .. length d - 1]]
+  decode dat = reverse [foldl1 (^+) (dat <^< (a - 1)) | a <- [1 .. length dat]]
 
   findOffset [] _ = Nothing
   findOffset ihd hdata = if res == maxlen then Nothing else Just res
@@ -60,7 +60,7 @@ instance Code HNum where
       st = setLength b n [neg $ HN b 1, HN b 1]
       preset = map (st <^<) [0 .. n - 1]
 
-  runPreset preset dat = map (foldl (^+) (HN (hBase $ head dat) 0) . (^* dat)) preset
+  runPreset preset dat  = map (foldl1 (^+) . (^* dat)) preset
 
   execPreset preset dat = map (^* dat) preset
 

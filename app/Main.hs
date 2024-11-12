@@ -78,7 +78,7 @@ buildUI _ model = widgetTree where
     , hgrid [
         vstack [
             numericField codeNC `styleBasic` [textCenter]
-          , dropdown selectDataBase [10, 16, 37] (\sRow -> hstack [ label "Base: ", label $ showt sRow ]) (label . showt)
+          , dropdown selectDataBase [2, 10, 16, 37] (\sRow -> hstack [ label "Base: ", label $ showt sRow ]) (label . showt)
           , spacer
           , textField codeText `styleBasic` [textCenter]
           , hgrid [
