@@ -34,8 +34,8 @@ import qualified Data.Text as T
 tapeText :: HTape [HNum] -> HTape Text
 tapeText t = HTape (showHCodeT $ tapeId t) (tapeOffset t) (tapeAntiOffset t) (tapeLength t)
 
-getHCT :: Int -> Text -> [HNum]
-getHCT n arr = map (fakeRead n) $ T.unpack arr
+getHCT :: HBase -> Text -> [HNum]
+getHCT base arr = map (fakeRead base) $ T.unpack arr
 
 dataText :: Int -> [HNum] -> (Text, Text)
 dataText n t = ((showHCodeT . decodeN n) t, (showHCodeT . codeN n) t)
@@ -46,7 +46,7 @@ showHCodeT arr = T.pack $ showHCode arr
 setBaseForce :: HBase -> [HNum] -> [HNum]
 setBaseForce b = map (\(HN _ v) -> HN b v)
 
-fakeRead :: Int -> Char -> HNum
-fakeRead n a = HN n $ fromMaybe 0 $
+fakeRead :: HBase -> Char -> HNum
+fakeRead base a = HN base $ fromMaybe 0 $
                elemIndex a $
-               take n hcodeAlfebet
+               take base hcodeAlfebet

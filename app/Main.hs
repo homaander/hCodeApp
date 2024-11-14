@@ -94,14 +94,24 @@ buildUI _ model = widgetTree where
           , hstack [
                 vstack [
                     label "Rank:"
-                  , label "Tape:"
+                  , label "Base:"
+                  , label "Val:"
+                  , label "---"
+                  , label "Tape ID Val:"
+                  , label "---"
+                  , label "Tape ID:"
                   , label "Offset:"
                   , label "Anti Offset:   "
-                  , label "Length:"
+                  , label_ "Length:\n " [multiline]
                   ]
               , vstack [
                     label $ showt $ length $ T.unpack $ model ^. codeText
-                  , label $ model ^. tapeInfoId
+                  , label $ showt baseVal
+                  , label $ showt $ HC.fromHData codeHN
+                  , label "---"
+                  , label $ showt $ HC.fromHData tapeInfoIdHN
+                  , label "---"
+                  , label tapeInfoIdT
                   , label $ showt $ model ^. tapeInfoOffset
                   , label $ showt $ model ^. tapeInfoAntiOffset
                   , label $ showt $ model ^. tapeInfoLength
@@ -111,8 +121,6 @@ buildUI _ model = widgetTree where
             `styleBasic` [paddingH 40, width 200]
     ]
 
-    , spacer
-    , spacer
     , label "Table:"
     , spacer
 
@@ -121,8 +129,8 @@ buildUI _ model = widgetTree where
         vstack [
             hgrid [
               dropdown selectRowNum [1 .. 5] (\sRow -> hstack [ label "Row: ", label $ showt sRow ]) (label . showt)
-            , button "To   T"   AppToTable
-            , button "From T" AppFromTable
+            , button "Write row"   AppToTable
+            , button "Read row" AppFromTable
             ]
           , spacer
           , box_ [alignCenter] (vstack [ hgrid [ label (T.pack $ mconcat [[toLetter a] <> " " | a <- b]) `styleBasic` [textSize 20] ] | b <- incodeT])
@@ -142,6 +150,12 @@ buildUI _ model = widgetTree where
       `styleBasic` [ padding 10 ]
 
   incodeT = model ^. codeTable
+  codeVal  = model ^. codeText
+  baseVal  = model ^. selectDataBase
+
+  tapeInfoIdT = model ^. tapeInfoId
+  tapeInfoIdHN = HC.getHCT baseVal tapeInfoIdT
+  codeHN = HC.getHCT baseVal codeVal
 
 
 
