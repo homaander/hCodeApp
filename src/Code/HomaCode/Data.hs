@@ -1,38 +1,41 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 module Code.HomaCode.Data (
-    HTape (..)
+  HTape (..),
 
-  , HNum (..)
-  , toLetter
-  , showHCode
-  , fromLetter
+  HNum (..),
+  toLetter,
+  showHCode,
+  fromLetter,
 
-  , HBase
-  , HVal
+  HBase,
+  HVal,
 
-  , HCount
-  , HRank
+  HCount,
+  HRank,
 
-  , hcodeAlfebet
+  hcodeAlfebet
 ) where
 
-import Data.List ( elemIndex )
+import Data.List  ( elemIndex )
 import Data.Maybe ( fromMaybe )
 
 hcodeAlfebet :: String
-hcodeAlfebet  =  "0123456789AB"
+hcodeAlfebet  = "0123456789AB"
              <> "CDEFGHIJKLMN"
              <> "OPQRSTUVWXYZ_"
 
-type HBase = Int
-type HVal  = Int
-type HCount  = Int
+type HBase  = Int
+type HVal   = Int
+type HCount = Int
 type HRank  = Int
 
-data HNum = HN { hBase :: HBase
-               , hVal  :: HVal }
-  deriving (Show, Eq)
+
+data HNum = HN { 
+  hBase :: HBase,
+  hVal  :: HVal 
+  }
+    deriving (Show, Eq)
 
 instance Ord HNum where
   (HN _ a) <= (HN _ b) = a <= b
@@ -49,8 +52,11 @@ showHCode :: [HNum] -> String
 showHCode a = mconcat $ map (pure . toLetter) a
 
 
-data HTape hdata = HTape { tapeId         :: hdata
-                         , tapeOffset     :: Int
-                         , tapeAntiOffset :: Int
-                         , tapeLength     :: Int }
-  deriving Show
+
+data HTape hdata = HTape {
+  tapeId         :: hdata,
+  tapeOffset     :: Int,
+  tapeAntiOffset :: Int,
+  tapeLength     :: Int
+  }
+    deriving Show

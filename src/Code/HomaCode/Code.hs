@@ -64,6 +64,7 @@ instance Code HNum where
 
   execPreset preset dat = map (^* dat) preset
 
+
 -- >>> [HN 10 1, HN 10 2] <^< 1
 -- [HN {hBase = 10, hVal = 2},HN {hBase = 10, hVal = 0}]
 
