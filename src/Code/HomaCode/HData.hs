@@ -7,21 +7,22 @@ import Code.HomaCode.Data
 import Code.HomaCode.Math
 
 class Math a => HData a where
-  (<^<) :: [a] -> Int -> [a]
-  (>^>) :: [a] -> Int -> [a]
+  (<^<) :: [a] -> HCount -> [a]
+  (>^>) :: [a] -> HCount -> [a]
 
   fromHData   :: [a] -> Int
   toHData     :: HBase -> Int -> [a]
-  toHDataN    :: HBase -> Int -> Int -> [a]
+  toHDataN    :: HBase -> HRank -> Int -> [a]
 
-  setLength :: HBase -> Int -> [a] -> [a]
+  setRank :: HBase -> HRank -> [a] -> [a]
 
-  setBase :: Int -> HBase -> [a] -> [a]
+  setBase :: HBase -> Int -> [a] -> [a]
+  resetBase :: HBase -> [a] -> [a]
 
   -- default
-  toHDataN b l dat = setLength b l $ toHData b dat
+  toHDataN base rank dat = setRank base rank $ toHData base dat
 
-  setBase b l dat = toHDataN b l $ fromHData dat
+  setBase base rank dat = toHDataN base rank $ fromHData dat
 
 
 instance HData HNum where
@@ -34,10 +35,12 @@ instance HData HNum where
     where
       powArr = map (hBase hf ^) $ reverse [0 .. length hdata - 1]
 
-  toHData b num = map (HN b . (`mod` b) . div num) powArr
+  toHData base num = map (HN base . (`mod` base) . div num) powArr
     where
-      powArr = map (b ^) $ reverse [0 .. len - 1]
-      len    = ceiling @Double @Int $ logBase (fromIntegral b) (fromIntegral num + 0.1)
+      powArr = map (base ^) $ reverse [0 .. len - 1]
+      len    = ceiling @Double @Int $ logBase (fromIntegral base) (fromIntegral num + 0.1)
 
-  setLength b nN dat = replicate (nN - length dat) (HN b 0) <> dat
+  setRank base rank dat = replicate (rank - length dat) (HN base 0) <> dat
+
+  resetBase base = map (\(HN _ v) -> HN base v)
 

@@ -66,7 +66,7 @@ type AppEventResp' = AppEventResponse AppModel AppEvent
 buildUI :: WidgetEnv' -> AppModel -> WidgetNode'
 buildUI _ model = widgetTree where
   widgetTree = vstack
-    [ 
+    [
       label "H_Code" `styleBasic` [ textSize 32 ]
     , spacer
 
@@ -154,8 +154,8 @@ buildUI _ model = widgetTree where
   baseVal  = model ^. selectDataBase
 
   tapeInfoIdT = model ^. tapeInfoId
-  tapeInfoIdHN = HC.getHCT baseVal tapeInfoIdT
-  codeHN = HC.getHCT baseVal codeVal
+  tapeInfoIdHN = HC.getHCodeText baseVal tapeInfoIdT
+  codeHN = HC.getHCodeText baseVal codeVal
 
 
 
@@ -177,7 +177,7 @@ handleEvent _ _ model evt =
     AppTLeft    -> [ Model $ model & codeTable .~ snd dataT  ]
 
     AppToTable   -> [ Model $ model & codeTable .~ incodeTUpdate ]
-    AppFromTable -> [ Model $ model & codeText  .~ HC.showHCodeT (incodeT !! (rowNum - 1)) ]
+    AppFromTable -> [ Model $ model & codeText  .~ HC.showHCodeText (incodeT !! (rowNum - 1)) ]
   where
     -- Code / Decode
     baseVal  = model ^. selectDataBase
@@ -186,13 +186,13 @@ handleEvent _ _ model evt =
 
     rowNum = model ^. selectRowNum
 
-    codeHN = HC.getHCT baseVal codeVal
+    codeHN = HC.getHCodeText baseVal codeVal
 
     dataV = HC.dataText codeNVal    codeHN
     tapeV = HC.tapeText $ HC.toTape codeHN
 
     -- Table Code / Decode
-    incodeT  = map (HC.setBaseForce baseVal) $ model ^. codeTable
+    incodeT  = map (HC.resetBase baseVal) $ model ^. codeTable
     incodeTR = transpose incodeT
 
     incodeTUpdate = take (rowNum - 1) incodeT <> [codeHN] <> drop rowNum incodeT
@@ -202,7 +202,13 @@ handleEvent _ _ model evt =
 
 -- main :: IO ()
 -- main = do
---   print $ map showHCode $ getStarter (HC.getHCT @HNumsL "ANDREW")
+--   let
+--     -- from 2'565'726'409 (2565726409)
+--     -- res: 142'540'356 (142540356)
+--     dat = HC.getHCodeText 37 "ANDREW"
+--     preset  = HC.getPreset @HNum 37 6 100000
+--     results = iterate (HC.runPreset preset) dat !! 1425
+--   print $ showHCode $ HC.codeN 40356 results
 
 main :: IO ()
 main = do

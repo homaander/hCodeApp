@@ -9,11 +9,9 @@ module Code.HomaCode (
   , TapeInfo(..)
 
   , tapeText
-  , getHCT
   , dataText
-  , showHCodeT
-  , fakeRead
-  , setBaseForce
+  , getHCodeText
+  , showHCodeText
 
   -- , Arr(..)
 ) where
@@ -26,27 +24,19 @@ import Code.HomaCode.Tape
 import Code.HomaCode.TapeInfo
 
 
-import Data.List ( elemIndex )
-import Data.Maybe ( fromMaybe )
 import Data.Text (Text)
 import qualified Data.Text as T
 
-tapeText :: HTape [HNum] -> HTape Text
-tapeText t = HTape (showHCodeT $ tapeId t) (tapeOffset t) (tapeAntiOffset t) (tapeLength t)
 
-getHCT :: HBase -> Text -> [HNum]
-getHCT base arr = map (fakeRead base) $ T.unpack arr
+-- forText
+tapeText :: HTape [HNum] -> HTape Text
+tapeText t = HTape (showHCodeText $ tapeId t) (tapeOffset t) (tapeAntiOffset t) (tapeLength t)
 
 dataText :: Int -> [HNum] -> (Text, Text)
-dataText n t = ((showHCodeT . decodeN n) t, (showHCodeT . codeN n) t)
+dataText n t = ((showHCodeText . decodeN n) t, (showHCodeText . codeN n) t)
 
-showHCodeT :: [HNum] -> Text
-showHCodeT arr = T.pack $ showHCode arr
+getHCodeText :: HBase -> Text -> [HNum]
+getHCodeText base arr = map (fromLetter base) $ T.unpack arr
 
-setBaseForce :: HBase -> [HNum] -> [HNum]
-setBaseForce b = map (\(HN _ v) -> HN b v)
-
-fakeRead :: HBase -> Char -> HNum
-fakeRead base a = HN base $ fromMaybe 0 $
-               elemIndex a $
-               take base hcodeAlfebet
+showHCodeText :: [HNum] -> Text
+showHCodeText arr = T.pack $ showHCode arr

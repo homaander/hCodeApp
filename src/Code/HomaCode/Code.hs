@@ -7,20 +7,20 @@ import Code.HomaCode.Math
 import Code.HomaCode.HData
 
 class HData a => Code a where
-  (-^>) :: [a] -> Int -> [a]
-  (<^-) :: [a] -> Int -> [a]
+  (-^>) :: [a] -> HCount -> [a]
+  (<^-) :: [a] -> HCount -> [a]
 
-  getPreset  :: HBase -> Int ->  Int  -> [[a]]
+  getPreset  :: HBase -> HRank -> HCount -> [[a]]
   execPreset :: [[a]] -> [a] -> [[a]]
   runPreset  :: [[a]] -> [a] ->  [a]
 
   code       :: [a] -> [a]
-  codeN      :: Int -> [a] ->  [a]
-  codeNList  :: Int -> [a] -> [[a]]
+  codeN      :: HCount -> [a] ->  [a]
+  codeNList  :: HCount -> [a] -> [[a]]
   codeR      :: [a] -> [a]
 
   decode  ::  [a] -> [a]
-  decodeN ::  Int -> [a] -> [a]
+  decodeN ::  HCount -> [a] -> [a]
 
   findOffset :: [a] -> [a] -> Maybe Int
   findList   :: [a] -> [a] -> Maybe [[a]]
@@ -57,7 +57,7 @@ instance Code HNum where
   getPreset b n a | a <= 0    = map (decodeN (1 - a)) preset
                   | otherwise = map (codeN   (a - 1)) preset
     where
-      st = setLength b n [neg $ HN b 1, HN b 1]
+      st = setRank b n [neg $ HN b 1, HN b 1]
       preset = map (st <^<) [0 .. n - 1]
 
   runPreset preset dat  = map (foldl1 (^+) . (^* dat)) preset

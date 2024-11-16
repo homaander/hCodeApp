@@ -41,7 +41,7 @@ main = do
   -- Tape
   --   Основные данные заданного кода в ленте
   --   [HN 16 0,HN 16 0,HN 16 7,HN 16 4,HN 16 5,HN 16 4]
-  test "toTape" (show $ toTape v) (show $ HTape {tapeId = getHCT 16 "007454", tapeOffset = 275, tapeAntiOffset = 229, tapeLength = 504})
+  test "toTape" (show $ toTape v) (show $ HTape {tapeId = getHCodeText 16 "007454", tapeOffset = 275, tapeAntiOffset = 229, tapeLength = 504})
 
   -- -- TapeInfo
   -- --   Узнать какие ленты можно получить из суммы двух, смещая 2 ленту до 500
