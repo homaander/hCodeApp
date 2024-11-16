@@ -223,46 +223,46 @@ handleEvent _ _ model evt =
     dataT  = (map HC.code incodeT, map HC.decode incodeT)
     dataTR = (transpose $ map HC.code incodeTR, transpose $ map HC.decode incodeTR)
 
-main :: IO ()
-main = do
-  let
-    base = 37
-    rank = 6
-  print $ HC.trapFinderLength base rank (HC.getHCodeText base "ANDREW")
-
-  -- let
-  --   dat     = HC.getHCodeText 37 "ANDREW"
-  --   preset  = HC.getPreset @HNum 37 6 100000
-  --   results = iterate (HC.runPreset preset) dat !! 1425
-  -- print $ showHCode $ HC.codeN 40356 results
-
 -- main :: IO ()
 -- main = do
---     startApp model handleEvent buildUI config
---   where
---     config = [
---       appWindowTitle "H Code App",
---       appWindowIcon  "./assets/images/icon.png",
---       appTheme       darkTheme,
---       appFontDef     "Regular" "./assets/fonts/FiraCode-Light.ttf",
---       appInitEvent   AppInit
---       ]
+--   let
+--     base = 37
+--     rank = 6
+--   print $ HC.trapFinderLength base rank (HC.getHCodeText base "ANDREW")
 
---     model = AppModel {
---       _codeText   = "12345",
---       _tapeInfoId = "?????",
---       _codeTable = [ 
---         HC.toHDataN 10 5 13243,
---         HC.toHDataN 10 5 67521,
---         HC.toHDataN 10 5 43212,
---         HC.toHDataN 10 5 98721,
---         HC.toHDataN 10 5 84328
---         ],
---       _codeNC             = 1,
---       _selectDataBase     = 10,
---       _selectRowNum       = 1,
---       _tapeInfoLength     = 0,
---       _tapeInfoOffset     = 0,
---       _tapeInfoAntiOffset = 0
---       }
+--   -- let
+--   --   dat     = HC.getHCodeText 37 "ANDREW"
+--   --   preset  = HC.getPreset @HNum 37 6 100000
+--   --   results = iterate (HC.runPreset preset) dat !! 1425
+--   -- print $ showHCode $ HC.codeN 40356 results
+
+main :: IO ()
+main = do
+    startApp model handleEvent buildUI config
+  where
+    config = [
+      appWindowTitle "H Code App",
+      appWindowIcon  "./assets/images/icon.png",
+      appTheme       darkTheme,
+      appFontDef     "Regular" "./assets/fonts/FiraCode-Light.ttf",
+      appInitEvent   AppInit
+      ]
+
+    model = AppModel {
+      _codeText   = "12345",
+      _tapeInfoId = "?????",
+      _codeTable = [ 
+        HC.toHDataN 10 5 13243,
+        HC.toHDataN 10 5 67521,
+        HC.toHDataN 10 5 43212,
+        HC.toHDataN 10 5 98721,
+        HC.toHDataN 10 5 84328
+        ],
+      _codeNC             = 1,
+      _selectDataBase     = 10,
+      _selectRowNum       = 1,
+      _tapeInfoLength     = 0,
+      _tapeInfoOffset     = 0,
+      _tapeInfoAntiOffset = 0
+      }
 
