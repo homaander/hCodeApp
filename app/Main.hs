@@ -227,7 +227,7 @@ handleEvent _ _ model evt =
 -- main = do
 --   let
 --     base = 37
---     rank = 6
+--     rank = 6 
 --   print $ HC.trapFinderLength base rank (HC.getHCodeText base "ANDREW")
 
 --   -- let
