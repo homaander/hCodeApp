@@ -15,6 +15,8 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import TextShow ( TextShow(showt) )
 
+
+-- import Blocks
 import Code.HomaCode.Data
 import qualified Code.HomaCode as HC
 -- import Code.HomaCode.Parallel

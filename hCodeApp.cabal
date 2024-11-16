@@ -23,6 +23,7 @@ source-repository head
 
 library
   exposed-modules:
+      Blocks
       Code.HomaCode
       Code.HomaCode.Code
       Code.HomaCode.Data
@@ -80,8 +81,8 @@ executable hCodeApp-exe
     , text-show
   default-language: Haskell2010
 
-executable hCodeApp-hsbin
-  main-is: HSBin.hs
+executable hsbin
+  main-is: Main.hs
   other-modules:
       CtrlMST
       CtrlMStateT
