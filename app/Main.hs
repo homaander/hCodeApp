@@ -205,6 +205,7 @@ handleEvent _ _ model evt =
 --   let
 --     -- from 2'565'726'409 (2565726409)
 --     -- res: 142'540'356 (142540356)
+--     -- 1/18
 --     dat = HC.getHCodeText 37 "ANDREW"
 --     preset  = HC.getPreset @HNum 37 6 100000
 --     results = iterate (HC.runPreset preset) dat !! 1425
