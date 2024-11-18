@@ -7,8 +7,8 @@
 module Main(main) where
 
 import Monomer
-
 import Control.Lens
+-- import qualified Monomer.Lens as L
 
 import Data.List (transpose)
 import Data.Text (Text)
@@ -23,24 +23,22 @@ import qualified Code.HomaCode as HC
 
 
 -- import Data.Maybe
--- import qualified Monomer.Lens as L
 -- import Monomer.Core.Lens (HasFontSize(fontSize))
 
 data AppModel = AppModel {
-    _codeText           :: Text,
-    _codeTable          :: [[HNum]],
+  _codeText           :: Text,
+  _codeTable          :: [[HNum]],
 
-    _codeNC             :: Int,
+  _codeNC             :: Int,
 
-    _selectDataBase     :: HBase,
-    _selectRowNum       :: Int,
+  _selectDataBase     :: HBase,
+  _selectRowNum       :: Int,
 
-    _tapeInfoId         :: Text,
-    _tapeInfoOffset     :: Int,
-    _tapeInfoAntiOffset :: Int,
-    _tapeInfoLength     :: Int
-  }
-    deriving (Eq, Show)
+  _tapeInfoId         :: Text,
+  _tapeInfoOffset     :: Int,
+  _tapeInfoAntiOffset :: Int,
+  _tapeInfoLength     :: Int
+  } deriving (Eq, Show)
 
 makeLenses 'AppModel
 
@@ -66,7 +64,7 @@ type AppEventResp' = AppEventResponse AppModel AppEvent
 
 
 buildUI :: WidgetEnv' -> AppModel -> WidgetNode'
-buildUI _ model = widgetTree 
+buildUI _ model = widgetTree
   where
     widgetTree = vstack [
 
@@ -94,43 +92,47 @@ buildUI _ model = widgetTree
             button "---->"   AppCode
             ]
               `styleBasic` [width 300]
-        ]
-          `styleBasic` [paddingH 10, width 300],
+          ]
+            `styleBasic` [paddingH 10, width 300],
 
-        vstack [ 
+        vstack [
           button "Get Info" AppTapeInfo,
 
           spacer,
 
-          hstack [ 
-            vstack [
+          hstack_ [childSpacing_ 50] [
+            vstack $ map (`styleBasic` [width 100, textSize 14]) [
               label "Rank:",
               label "Base:",
-              label "Val:",
-              label "---",
+              label "------------",
+              label "Data HN:",
+              label "Data Val:",
+              label "------------",
+              label "Tape ID HN:",
               label "Tape ID Val:",
-              label "---",
-              label "Tape ID:",
+              label "------------",
               label "Offset:",
-              label "Anti Offset:   ",
+              label "Anti Offset:",
               label_ "Length:\n " [multiline]
               ],
 
-            vstack [
+            vstack $ map (`styleBasic` [width 100, textSize 14]) [
               label $ showt $ length $ T.unpack $ model ^. codeText,
               label $ showt baseVal,
+              label "------------",
+              label $ "HN " <> codeVal,
               label $ showt $ HC.fromHData codeHN,
-              label "---",
+              label "------------",
+              label $ "HN " <> tapeInfoIdT,
               label $ showt $ HC.fromHData tapeInfoIdHN,
-              label "---",
-              label tapeInfoIdT,
+              label "------------",
               label $ showt $ model ^. tapeInfoOffset,
               label $ showt $ model ^. tapeInfoAntiOffset,
               label $ showt $ model ^. tapeInfoLength
               ]
             ]
           ]
-            `styleBasic` [paddingH 40, width 200]
+            `styleBasic` [border 1 black, paddingT 10, paddingH 40, width 200]
         ],
 
       label "Table:",
@@ -139,7 +141,7 @@ buildUI _ model = widgetTree
 
       hgrid [
         vstack [
-          hgrid [ 
+          hgrid [
             dropdown selectRowNum [1 .. 5]
               (\sRow -> hstack [ label "Row: ", label $ showt sRow ]) (label . showt),
 
@@ -148,15 +150,46 @@ buildUI _ model = widgetTree
             ],
 
           spacer,
+          spacer,
 
-          box_ [alignCenter] $ 
-            vstack [
-              hgrid [
-                label (T.pack $ mconcat [[toLetter a] <> " " | a <- b]) 
-                  `styleBasic` [textSize 20] 
-                ] | b <- incodeT
+          box_ [alignCenter] $ vgrid_ [childSpacing_ 10] [
+            hgrid_ [childSpacing_ 10] [
+              spacer,
+              vgrid $ [
+                label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
+                  `styleBasic` [textColor gray]
+                | b <- snd dataTR
+                ],
+              spacer
+              ],
+
+            hgrid_ [childSpacing_ 10] [
+              vgrid [
+                label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
+                  `styleBasic` [textColor gray]
+                | b <- snd dataT
+                ],
+              vgrid [
+                label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
+                | b <- incodeT
+                ],
+              vgrid [
+                label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
+                  `styleBasic` [textColor gray]
+                | b <- fst dataT
+                ]
+              ],
+
+            hgrid_ [childSpacing_ 10] [
+              spacer,
+              vgrid [
+                label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
+                  `styleBasic` [textColor gray]
+                | b <- fst dataTR
+                ],
+              spacer
               ]
-                `styleBasic` [paddingH 40, width 200]
+            ]
           ],
 
         vstack [
@@ -172,13 +205,18 @@ buildUI _ model = widgetTree
       ]
         `styleBasic` [ padding 10 ]
 
-    incodeT  = model ^. codeTable
     codeVal  = model ^. codeText
     baseVal  = model ^. selectDataBase
-    
+
     tapeInfoIdT = model ^. tapeInfoId
     tapeInfoIdHN = HC.getHCodeText baseVal tapeInfoIdT
     codeHN = HC.getHCodeText baseVal codeVal
+
+    incodeT  = model ^. codeTable
+    incodeTR = transpose incodeT
+
+    dataT  = (map HC.code incodeT, map HC.decode incodeT)
+    dataTR = (transpose $ map HC.code incodeTR, transpose $ map HC.decode incodeTR)
 
 
 
@@ -189,10 +227,10 @@ handleEvent _ _ model evt =
     AppDecode    -> [ Model $ model & codeText .~ fst dataV ]
     AppCode      -> [ Model $ model & codeText .~ snd dataV ]
     AppTapeInfo  -> [ Model $ model
-                        & tapeInfoId         .~ tapeId         tapeV
-                        & tapeInfoOffset     .~ tapeOffset     tapeV
-                        & tapeInfoAntiOffset .~ tapeAntiOffset tapeV
-                        & tapeInfoLength     .~ tapeLength     tapeV
+                      & tapeInfoId         .~ tapeId         tapeV
+                      & tapeInfoOffset     .~ tapeOffset     tapeV
+                      & tapeInfoAntiOffset .~ tapeAntiOffset tapeV
+                      & tapeInfoLength     .~ tapeLength     tapeV
                       ]
     AppTDown     -> [ Model $ model & codeTable .~ fst dataTR ]
     AppTUp       -> [ Model $ model & codeTable .~ snd dataTR ]
@@ -200,8 +238,8 @@ handleEvent _ _ model evt =
     AppTLeft     -> [ Model $ model & codeTable .~ snd dataT  ]
 
     AppToTable   -> [ Model $ model & codeTable .~ incodeTUpdate ]
-    AppFromTable -> [ Model $ model 
-                        & codeText  .~ HC.showHCodeText (incodeT !! (rowNum - 1))
+    AppFromTable -> [ Model $ model
+                      & codeText  .~ HC.showHCodeText (incodeT !! (rowNum - 1))
                       ]
   where
     -- Code / Decode
@@ -245,6 +283,7 @@ main = do
     config = [
       appWindowTitle "H Code App",
       appWindowIcon  "./assets/images/icon.png",
+      appWindowState (MainWindowNormal (800, 900)),
       appTheme       darkTheme,
       appFontDef     "Regular" "./assets/fonts/FiraCode-Light.ttf",
       appInitEvent   AppInit
@@ -253,7 +292,7 @@ main = do
     model = AppModel {
       _codeText   = "12345",
       _tapeInfoId = "?????",
-      _codeTable = [ 
+      _codeTable = [
         HC.toHDataN 10 5 13243,
         HC.toHDataN 10 5 67521,
         HC.toHDataN 10 5 43212,
