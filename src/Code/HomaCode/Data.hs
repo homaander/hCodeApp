@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
-
 module Code.HomaCode.Data (
   HTape (..),
 

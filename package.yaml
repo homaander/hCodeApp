@@ -25,14 +25,14 @@ default-extensions:
 dependencies:
 - base >= 4.7 && < 5
 - data-default
+- mtl
+- aeson
 - lens
-- monomer
 - text
 - text-show
-- aeson
-- parallel
+- monomer
 - deepseq
-- mtl
+- parallel
 
 ghc-options:
 - -Wall

@@ -1,5 +1,3 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
-
 module Code.HomaCode.Math (Math(..)) where
 
 import Code.HomaCode.Data

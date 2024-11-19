@@ -16,7 +16,7 @@ import qualified Data.Text as T
 import TextShow ( TextShow(showt) )
 
 
--- import Blocks
+-- import Templates.Blocks
 import Code.HomaCode.Data
 import qualified Code.HomaCode as HC
 -- import Code.HomaCode.Parallel
@@ -283,7 +283,7 @@ main = do
     config = [
       appWindowTitle "H Code App",
       appWindowIcon  "./assets/images/icon.png",
-      appWindowState (MainWindowNormal (800, 900)),
+      appWindowState (MainWindowNormal (800, 800)),
       appTheme       darkTheme,
       appFontDef     "Regular" "./assets/fonts/FiraCode-Light.ttf",
       appInitEvent   AppInit

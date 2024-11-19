@@ -23,15 +23,15 @@ source-repository head
 
 library
   exposed-modules:
-      Blocks
       Code.HomaCode
       Code.HomaCode.Code
       Code.HomaCode.Data
       Code.HomaCode.HData
       Code.HomaCode.Math
-      Code.HomaCode.Parallel
+      Code.HomaCode.Parallel.TapeInfo
       Code.HomaCode.Tape
       Code.HomaCode.TapeInfo
+      Templates.Blocks
   other-modules:
       Paths_hCodeApp
   autogen-modules:

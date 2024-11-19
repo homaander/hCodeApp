@@ -1,6 +1,3 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE FlexibleInstances #-}
-
 module Code.HomaCode.HData (HData(..)) where
 
 import Code.HomaCode.Data

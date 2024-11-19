@@ -1,4 +1,4 @@
-module Code.HomaCode.Parallel
+module Code.HomaCode.Parallel.TapeInfo ()
 -- (
 --    getTapeIdParallel
 --  , getOffsetParallel

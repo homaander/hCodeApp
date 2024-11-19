@@ -8,12 +8,11 @@ module Code.HomaCode (
   , Tape(..)
   , TapeInfo(..)
 
+    -- Text func
   , tapeText
   , dataText
   , getHCodeText
   , showHCodeText
-
-  -- , Arr(..)
 ) where
 
 import Code.HomaCode.Data

@@ -1,4 +1,4 @@
-module Blocks where
+module Templates.Blocks() where
 
 -- import Monomer
 

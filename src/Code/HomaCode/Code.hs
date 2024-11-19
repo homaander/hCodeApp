@@ -1,10 +1,9 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
 module Code.HomaCode.Code (Code(..)) where
 
 import Code.HomaCode.Data
 import Code.HomaCode.Math
 import Code.HomaCode.HData
+import Control.Monad
 
 class HData a => Code a where
   (-^>) :: [a] -> HCount -> [a]
@@ -44,11 +43,14 @@ instance Code HNum where
   decode dat = reverse [foldl1 (^+) (dat <^< (a - 1)) | a <- [1 .. length dat]]
 
   findOffset [] _ = Nothing
-  findOffset ihd hdata = if res == maxlen then Nothing else Just res
+  findOffset ihd hdata = do
+      guard $ res /= maxlen
+      pure res
     where
       res         = foldr finder 0 (codeNList maxlen ihd)
       finder he n = if he == hdata then 1 else n + 1
       maxlen      = hBase (head ihd) ^ length ihd
+
 
   findList ihd hdata = do
     off <- findOffset ihd hdata
@@ -64,6 +66,9 @@ instance Code HNum where
 
   execPreset preset dat = map (^* dat) preset
 
+
+-- >>> findOffset [HN 10 1, HN 10 2] [HN 10 1, HN 10 1]
+-- Just 1
 
 -- >>> [HN 10 1, HN 10 2] <^< 1
 -- [HN {hBase = 10, hVal = 2},HN {hBase = 10, hVal = 0}]
