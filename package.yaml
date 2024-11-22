@@ -59,14 +59,6 @@ executables:
     dependencies:
     - hCodeApp
 
-  hsbin:
-    main:                Main.hs
-    source-dirs:         bin
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-
 tests:
   hCodeApp-test:
     main:                Spec.hs

@@ -8,7 +8,6 @@ module Code.HomaCode.Data (
 
   HBase,
   HVal,
-
   HCount,
   HRank,
 
@@ -37,6 +36,10 @@ data HNum = HN {
 
 instance Ord HNum where
   (HN _ a) <= (HN _ b) = a <= b
+
+instance Read HNum where
+  readsPrec _ [] = []
+  readsPrec n (x:xs) = (fromLetter 10 x, xs) : readsPrec n xs
 
 toLetter :: HNum -> Char
 toLetter (HN _ a) = hcodeAlfebet !! a

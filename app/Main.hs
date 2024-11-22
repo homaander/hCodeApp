@@ -1,66 +1,69 @@
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DataKinds #-}
 
 module Main(main) where
 
-import Monomer
-import Control.Lens
--- import qualified Monomer.Lens as L
-
-import Data.List (transpose)
+-- import Data.Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
+import Data.List (transpose)
+
+import Monomer
+-- import qualified Monomer.Lens as L
+import Control.Lens
 import TextShow ( TextShow(showt) )
 
 
--- import Templates.Blocks
-import Code.HomaCode.Data
-import qualified Code.HomaCode as HC
--- import Code.HomaCode.Parallel
+import Cfg
+import Templates.Blocks
+
+import Code.HomaCode
 
 
--- import Data.Maybe
--- import Monomer.Core.Lens (HasFontSize(fontSize))
+-- main :: IO ()
+-- main = do
+--   let
+--     base = 37
+--     rank = 6 
+--   print $ HC.trapFinderLength base rank (HC.getHCodeText base "ANDREW")
 
-data AppModel = AppModel {
-  _codeText           :: Text,
-  _codeTable          :: [[HNum]],
+--   -- let
+--   --   dat     = HC.getHCodeText 37 "ANDREW"
+--   --   preset  = HC.getPreset @HNum 37 6 100000
+--   --   results = iterate (HC.runPreset preset) dat !! 1425
+--   -- print $ showHCode $ HC.codeN 40356 results
 
-  _codeNC             :: Int,
+main :: IO ()
+main = do
+    startApp model handleEvent buildUI config
+  where
+    config = [
+      appWindowTitle "H Code App",
+      appWindowIcon  "./assets/images/icon.png",
+      appWindowState (MainWindowNormal (800, 800)),
+      appTheme       darkTheme,
+      appFontDef     "Regular" "./assets/fonts/FiraCode-Light.ttf",
+      appInitEvent   AppInit
+      ]
 
-  _selectDataBase     :: HBase,
-  _selectRowNum       :: Int,
-
-  _tapeInfoId         :: Text,
-  _tapeInfoOffset     :: Int,
-  _tapeInfoAntiOffset :: Int,
-  _tapeInfoLength     :: Int
-  } deriving (Eq, Show)
-
-makeLenses 'AppModel
-
-data AppEvent = AppInit
-
-              | AppDecode
-              | AppCode
-              | AppTapeInfo
-
-              | AppToTable
-              | AppFromTable
-
-              | AppTUp
-              | AppTDown
-              | AppTLeft
-              | AppTRight
-  deriving (Eq, Show)
-
-
-type WidgetEnv'    = WidgetEnv AppModel AppEvent
-type WidgetNode'   = WidgetNode AppModel AppEvent
-type AppEventResp' = AppEventResponse AppModel AppEvent
+    model = AppModel {
+      _codeText   = "12345",
+      _tapeInfoId = "?????",
+      _codeTable = [
+        toHDataN 10 5 13243,
+        toHDataN 10 5 67521,
+        toHDataN 10 5 43212,
+        toHDataN 10 5 98721,
+        toHDataN 10 5 84328
+        ],
+      _codeNC             = 1,
+      _selectDataBase     = 10,
+      _selectRowNum       = 1,
+      _tapeInfoLength     = 0,
+      _tapeInfoOffset     = 0,
+      _tapeInfoAntiOffset = 0
+      }
 
 
 buildUI :: WidgetEnv' -> AppModel -> WidgetNode'
@@ -95,128 +98,16 @@ buildUI _ model = widgetTree
           ]
             `styleBasic` [paddingH 10, width 300],
 
-        vstack [
-          button "Get Info" AppTapeInfo,
-
-          spacer,
-
-          hstack_ [childSpacing_ 50] [
-            vstack $ map (`styleBasic` [width 100, textSize 14]) [
-              label "Rank:",
-              label "Base:",
-              label "------------",
-              label "Data HN:",
-              label "Data Val:",
-              label "------------",
-              label "Tape ID HN:",
-              label "Tape ID Val:",
-              label "------------",
-              label "Offset:",
-              label "Anti Offset:",
-              label_ "Length:\n " [multiline]
-              ],
-
-            vstack $ map (`styleBasic` [width 100, textSize 14]) [
-              label $ showt $ length $ T.unpack $ model ^. codeText,
-              label $ showt baseVal,
-              label "------------",
-              label $ "HN " <> codeVal,
-              label $ showt $ HC.fromHData codeHN,
-              label "------------",
-              label $ "HN " <> tapeInfoIdT,
-              label $ showt $ HC.fromHData tapeInfoIdHN,
-              label "------------",
-              label $ showt $ model ^. tapeInfoOffset,
-              label $ showt $ model ^. tapeInfoAntiOffset,
-              label $ showt $ model ^. tapeInfoLength
-              ]
-            ]
-          ]
-            `styleBasic` [border 1 black, paddingT 10, paddingH 40, width 200]
+        blockInfo model
         ],
 
       label "Table:",
 
       spacer,
 
-      hgrid [
-        vstack [
-          hgrid [
-            dropdown selectRowNum [1 .. 5]
-              (\sRow -> hstack [ label "Row: ", label $ showt sRow ]) (label . showt),
-
-            button "Write row"   AppToTable,
-            button "Read row"  AppFromTable
-            ],
-
-          spacer,
-          spacer,
-
-          box_ [alignCenter] $ vgrid_ [childSpacing_ 10] [
-            hgrid_ [childSpacing_ 10] [
-              spacer,
-              vgrid $ [
-                label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
-                  `styleBasic` [textColor gray]
-                | b <- snd dataTR
-                ],
-              spacer
-              ],
-
-            hgrid_ [childSpacing_ 10] [
-              vgrid [
-                label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
-                  `styleBasic` [textColor gray]
-                | b <- snd dataT
-                ],
-              vgrid [
-                label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
-                | b <- incodeT
-                ],
-              vgrid [
-                label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
-                  `styleBasic` [textColor gray]
-                | b <- fst dataT
-                ]
-              ],
-
-            hgrid_ [childSpacing_ 10] [
-              spacer,
-              vgrid [
-                label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
-                  `styleBasic` [textColor gray]
-                | b <- fst dataTR
-                ],
-              spacer
-              ]
-            ]
-          ],
-
-        vstack [
-          button "Up" AppTUp,
-          hgrid [
-            button "<-"  AppTLeft,
-            button "->" AppTRight
-            ],
-          button "Down" AppTDown
-          ]
-            `styleBasic` [paddingH 40, width 200]
-        ]
+      blockMatrix model
       ]
         `styleBasic` [ padding 10 ]
-
-    codeVal  = model ^. codeText
-    baseVal  = model ^. selectDataBase
-
-    tapeInfoIdT = model ^. tapeInfoId
-    tapeInfoIdHN = HC.getHCodeText baseVal tapeInfoIdT
-    codeHN = HC.getHCodeText baseVal codeVal
-
-    incodeT  = model ^. codeTable
-    incodeTR = transpose incodeT
-
-    dataT  = (map HC.code incodeT, map HC.decode incodeT)
-    dataTR = (transpose $ map HC.code incodeTR, transpose $ map HC.decode incodeTR)
 
 
 
@@ -239,7 +130,7 @@ handleEvent _ _ model evt =
 
     AppToTable   -> [ Model $ model & codeTable .~ incodeTUpdate ]
     AppFromTable -> [ Model $ model
-                      & codeText  .~ HC.showHCodeText (incodeT !! (rowNum - 1))
+                      & codeText  .~ showHCodeText (incodeT !! (rowNum - 1))
                       ]
   where
     -- Code / Decode
@@ -249,61 +140,16 @@ handleEvent _ _ model evt =
 
     rowNum = model ^. selectRowNum
 
-    codeHN = HC.getHCodeText baseVal codeVal
+    codeHN = getHCodeText baseVal codeVal
 
-    dataV = HC.dataText codeNVal    codeHN
-    tapeV = HC.tapeText $ HC.toTape codeHN
+    dataV = dataText codeNVal    codeHN
+    tapeV = tapeText $ toTape codeHN
 
     -- Table Code / Decode
-    incodeT  = map (HC.resetBase baseVal) $ model ^. codeTable
+    incodeT  = map (resetBase baseVal) $ model ^. codeTable
     incodeTR = transpose incodeT
 
     incodeTUpdate = take (rowNum - 1) incodeT <> [codeHN] <> drop rowNum incodeT
 
-    dataT  = (map HC.code incodeT, map HC.decode incodeT)
-    dataTR = (transpose $ map HC.code incodeTR, transpose $ map HC.decode incodeTR)
-
--- main :: IO ()
--- main = do
---   let
---     base = 37
---     rank = 6 
---   print $ HC.trapFinderLength base rank (HC.getHCodeText base "ANDREW")
-
---   -- let
---   --   dat     = HC.getHCodeText 37 "ANDREW"
---   --   preset  = HC.getPreset @HNum 37 6 100000
---   --   results = iterate (HC.runPreset preset) dat !! 1425
---   -- print $ showHCode $ HC.codeN 40356 results
-
-main :: IO ()
-main = do
-    startApp model handleEvent buildUI config
-  where
-    config = [
-      appWindowTitle "H Code App",
-      appWindowIcon  "./assets/images/icon.png",
-      appWindowState (MainWindowNormal (800, 800)),
-      appTheme       darkTheme,
-      appFontDef     "Regular" "./assets/fonts/FiraCode-Light.ttf",
-      appInitEvent   AppInit
-      ]
-
-    model = AppModel {
-      _codeText   = "12345",
-      _tapeInfoId = "?????",
-      _codeTable = [
-        HC.toHDataN 10 5 13243,
-        HC.toHDataN 10 5 67521,
-        HC.toHDataN 10 5 43212,
-        HC.toHDataN 10 5 98721,
-        HC.toHDataN 10 5 84328
-        ],
-      _codeNC             = 1,
-      _selectDataBase     = 10,
-      _selectRowNum       = 1,
-      _tapeInfoLength     = 0,
-      _tapeInfoOffset     = 0,
-      _tapeInfoAntiOffset = 0
-      }
-
+    dataT  = (map code incodeT, map decode incodeT)
+    dataTR = (transpose $ map code incodeTR, transpose $ map decode incodeTR)

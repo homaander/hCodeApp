@@ -2,17 +2,32 @@
 {-# LANGUAGE MonoLocalBinds #-}
 
 module Code.HomaCode (
-    Math(..)
-  , HData(..)
-  , Code(..)
-  , Tape(..)
-  , TapeInfo(..)
+  Math(..),
+  HData(..),
+  Code(..),
+  Tape(..),
+  TapeInfo(..),
 
-    -- Text func
-  , tapeText
-  , dataText
-  , getHCodeText
-  , showHCodeText
+  -- Text func
+  tapeText,
+  dataText,
+  getHCodeText,
+  showHCodeText,
+
+  -- Data
+  HTape (..),
+
+  HNum (..),
+  toLetter,
+  showHCode,
+  fromLetter,
+
+  HBase,
+  HVal,
+  HCount,
+  HRank,
+
+  hcodeAlfebet
 ) where
 
 import Code.HomaCode.Data
