@@ -4,9 +4,6 @@
 
 module Main(main) where
 
--- import Data.Maybe
-import Data.Text (Text)
-import qualified Data.Text as T
 import Data.List (transpose)
 
 import Monomer
@@ -19,7 +16,6 @@ import Cfg
 import Templates.Blocks
 
 import Code.HomaCode
-
 
 -- main :: IO ()
 -- main = do
@@ -47,35 +43,15 @@ main = do
       appInitEvent   AppInit
       ]
 
-    model = AppModel {
-      _codeText   = "12345",
-      _tapeInfoId = "?????",
-      _codeTable = [
-        toHDataN 10 5 13243,
-        toHDataN 10 5 67521,
-        toHDataN 10 5 43212,
-        toHDataN 10 5 98721,
-        toHDataN 10 5 84328
-        ],
-      _codeNC             = 1,
-      _selectDataBase     = 10,
-      _selectRowNum       = 1,
-      _tapeInfoLength     = 0,
-      _tapeInfoOffset     = 0,
-      _tapeInfoAntiOffset = 0
-      }
+    model = AppModel "" [] 1 10 1 "" 0 0 0
 
 
 buildUI :: WidgetEnv' -> AppModel -> WidgetNode'
 buildUI _ model = widgetTree
   where
     widgetTree = vstack [
-
-      label "H_Code" `styleBasic` [ textSize 32 ],
-      spacer,
-
+      label "H_Code" `styleBasic` [ textSize 32, paddingB 10 ],
       label "Default code:",
-      spacer,
 
       hgrid [
         vstack [
@@ -83,9 +59,8 @@ buildUI _ model = widgetTree
             `styleBasic` [textCenter],
 
           dropdown selectDataBase [2, 10, 16, 37]
-            (\sRow -> hstack [ label "Base: ", label $ showt sRow ]) (label . showt),
-
-          spacer,
+            (\sRow -> hstack [ label "Base: ", label $ showt sRow ]) (label . showt)
+            `styleBasic` [paddingB 10],
 
           textField codeText
             `styleBasic` [textCenter],
@@ -101,10 +76,9 @@ buildUI _ model = widgetTree
         blockInfo model
         ],
 
-      label "Table:",
+      label "Table:" `styleBasic` [paddingB 10],
 
-      spacer,
-
+      -- animShake_ [ shakeV, autoStart_ True, duration (Millisecond 500) ] $ blockMatrix model,
       blockMatrix model
       ]
         `styleBasic` [ padding 10 ]
@@ -117,11 +91,12 @@ handleEvent _ _ model evt =
     AppInit      -> []
     AppDecode    -> [ Model $ model & codeText .~ fst dataV ]
     AppCode      -> [ Model $ model & codeText .~ snd dataV ]
-    AppTapeInfo  -> [ Model $ model
-                      & tapeInfoId         .~ tapeId         tapeV
-                      & tapeInfoOffset     .~ tapeOffset     tapeV
-                      & tapeInfoAntiOffset .~ tapeAntiOffset tapeV
-                      & tapeInfoLength     .~ tapeLength     tapeV
+    AppTapeInfo  -> [
+                      Model $ model
+                        & tapeInfoId         .~ tapeId         tapeV
+                        & tapeInfoOffset     .~ tapeOffset     tapeV
+                        & tapeInfoAntiOffset .~ tapeAntiOffset tapeV
+                        & tapeInfoLength     .~ tapeLength     tapeV
                       ]
     AppTDown     -> [ Model $ model & codeTable .~ fst dataTR ]
     AppTUp       -> [ Model $ model & codeTable .~ snd dataTR ]
@@ -129,8 +104,9 @@ handleEvent _ _ model evt =
     AppTLeft     -> [ Model $ model & codeTable .~ snd dataT  ]
 
     AppToTable   -> [ Model $ model & codeTable .~ incodeTUpdate ]
-    AppFromTable -> [ Model $ model
-                      & codeText  .~ showHCodeText (incodeT !! (rowNum - 1))
+    AppFromTable -> [
+                      Model $ model
+                        & codeText  .~ showHCodeText (incodeT !! (rowNum - 1))
                       ]
   where
     -- Code / Decode

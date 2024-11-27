@@ -1,11 +1,12 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 
 module Cfg where
 
-import Monomer
-
-import Control.Lens
 import Data.Text (Text)
+
+import Monomer
+import Control.Lens
 import Code.HomaCode.Data
 
 data AppModel = AppModel {
@@ -39,7 +40,6 @@ data AppEvent = AppInit
               | AppTLeft
               | AppTRight
   deriving (Eq, Show)
-
 
 type WidgetEnv'    = WidgetEnv AppModel AppEvent
 type WidgetNode'   = WidgetNode AppModel AppEvent

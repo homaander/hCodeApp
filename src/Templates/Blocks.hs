@@ -29,7 +29,7 @@ blockInfo model = vstack [
       label "------------",
       label "Offset:",
       label "Anti Offset:",
-      label_ "Length:\n " [multiline]
+      label "Length:" `styleBasic` [paddingB 10]
       ],
 
     vstack $ map (`styleBasic` [width 100, textSize 14]) [
@@ -59,6 +59,11 @@ blockInfo model = vstack [
     codeHN = getHCodeText baseVal codeVal
 
 
+labelMatrix :: [HNum] -> Color -> WidgetNode s e
+labelMatrix b color = label 
+  (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
+    `styleBasic` [textColor color]
+
 blockMatrix :: AppModel -> WidgetNode AppModel AppEvent
 blockMatrix model = hgrid [
   vstack [
@@ -66,48 +71,27 @@ blockMatrix model = hgrid [
       dropdown selectRowNum [1 .. 5]
         (\sRow -> hstack [ label "Row: ", label $ showt sRow ]) (label . showt),
 
-      button "Write row"   AppToTable,
+      button "Write row" AppToTable,
       button "Read row"  AppFromTable
-      ],
-
-    spacer,
-    spacer,
+      ]
+      `styleBasic` [ paddingB 30 ],
 
     box_ [alignCenter] $ vgrid_ [childSpacing_ 10] [
       hgrid_ [childSpacing_ 10] [
         spacer,
-        vgrid $ [
-          label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
-            `styleBasic` [textColor gray]
-          | b <- snd dataTR
-          ],
+        vgrid [ labelMatrix b gray | b <- snd dataTR ],
         spacer
         ],
 
       hgrid_ [childSpacing_ 10] [
-        vgrid [
-          label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
-            `styleBasic` [textColor gray]
-          | b <- snd dataT
-          ],
-        vgrid [
-          label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
-          | b <- incodeT
-          ],
-        vgrid [
-          label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
-            `styleBasic` [textColor gray]
-          | b <- fst dataT
-          ]
+        vgrid [ labelMatrix b gray  | b <- snd dataT ],
+        vgrid [ labelMatrix b white | b <- incodeT   ],
+        vgrid [ labelMatrix b gray  | b <- fst dataT ]
         ],
 
       hgrid_ [childSpacing_ 10] [
         spacer,
-        vgrid [
-          label (T.pack $ mconcat [[toLetter a] <> " " | a <- b])
-            `styleBasic` [textColor gray]
-          | b <- fst dataTR
-          ],
+        vgrid [ labelMatrix b gray | b <- fst dataTR ],
         spacer
         ]
       ]
